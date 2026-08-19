@@ -83,13 +83,13 @@ Open your browser and navigate to:
 ## 🖼️ System Visuals
 
 **Landing Page**
-<img src="screenshots/landing_page.png" alt="Landing Page" width="100%">
+<img src="screenshots/landing_home.png" alt="Landing Page" width="100%">
 
 **Super Administrator Dashboard**
-<img src="screenshots/admin_dashboard.png" alt="Super Administrator Dashboard" width="100%">
+<img src="screenshots/Super_Admin_admin_users.png" alt="Super Administrator Dashboard" width="100%">
 
 **NGO Administrator Dashboard**
-<img src="screenshots/ngo_dashboard.png" alt="NGO Administrator Dashboard" width="100%">
+<img src="screenshots/NGO_Admin_admin_campaigns.png" alt="NGO Administrator Dashboard" width="100%">
 
 **Event Coordinator Dashboard**
-<img src="screenshots/coordinator_dashboard.png" alt="Event Coordinator Dashboard" width="100%">
+<img src="screenshots/Coordinator_coordinator_tasks.png" alt="Event Coordinator Dashboard" width="100%">
