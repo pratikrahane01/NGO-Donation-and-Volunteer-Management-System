@@ -78,27 +78,4 @@ Open your browser and navigate to:
 - [ ] **Advanced Analytics**: Interactive charting using Chart.js for data visualization.
 - [ ] **RESTful API**: Exposing core services for mobile application consumption.
 
----
 
-## 🖼️ System Visuals
-
-**Landing Page**
-<img src="screenshots/landing_home.png" alt="Landing Page" width="100%">
-
-**Login Portal**
-<img src="screenshots/login_page.png" alt="Login Page" width="100%">
-
-**Super Admin Panel**
-<img src="screenshots/Super_Admin_admin_users.png" alt="Super Admin Panel" width="100%">
-
-**NGO Admin Dashboard**
-<img src="screenshots/NGO_Admin_admin_campaigns.png" alt="NGO Admin Dashboard" width="100%">
-
-**Coordinator Dashboard**
-<img src="screenshots/Coordinator_coordinator_tasks.png" alt="Coordinator Dashboard" width="100%">
-
-**Volunteer Dashboard**
-<img src="screenshots/Volunteer_volunteer_available_events.png" alt="Volunteer Dashboard" width="100%">
-
-**Donor Dashboard**
-<img src="screenshots/Donor_donor_profile.png" alt="Donor Dashboard" width="100%">
