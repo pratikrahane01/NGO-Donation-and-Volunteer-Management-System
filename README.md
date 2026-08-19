@@ -85,17 +85,20 @@ Open your browser and navigate to:
 **Landing Page**
 <img src="screenshots/landing_home.png" alt="Landing Page" width="100%">
 
-**Super Admin Dashboard**
-<img src="screenshots_v2/Super_Admin_dashboard_auto.png" alt="Super Admin Dashboard" width="100%">
+**Login Portal**
+<img src="screenshots/login_page.png" alt="Login Page" width="100%">
+
+**Super Admin Panel**
+<img src="screenshots/Super_Admin_admin_users.png" alt="Super Admin Panel" width="100%">
 
 **NGO Admin Dashboard**
-<img src="screenshots_v2/NGO_Admin_ngo_dashboard.png" alt="NGO Admin Dashboard" width="100%">
+<img src="screenshots/NGO_Admin_admin_campaigns.png" alt="NGO Admin Dashboard" width="100%">
 
 **Coordinator Dashboard**
-<img src="screenshots_v2/Coordinator_coordinator_dashboard.png" alt="Coordinator Dashboard" width="100%">
+<img src="screenshots/Coordinator_coordinator_tasks.png" alt="Coordinator Dashboard" width="100%">
 
 **Volunteer Dashboard**
-<img src="screenshots_v2/Volunteer_volunteer_dashboard.png" alt="Volunteer Dashboard" width="100%">
+<img src="screenshots/Volunteer_volunteer_available_events.png" alt="Volunteer Dashboard" width="100%">
 
 **Donor Dashboard**
-<img src="screenshots_v2/Donor_donor_dashboard.png" alt="Donor Dashboard" width="100%">
+<img src="screenshots/Donor_donor_profile.png" alt="Donor Dashboard" width="100%">
