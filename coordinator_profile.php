@@ -80,24 +80,10 @@ $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
 $stmt->execute([$user_id]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Event Coordinator Profile | <?php echo htmlspecialchars(APP_NAME); ?></title>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="assets/css/dashboard.css">
-</head>
-<body>
-
-<div class="dashboard-layout">
-    <?php include __DIR__ . '/includes/dashboard/sidebar.php'; ?>
-
-    <main class="main-content">
-        <?php include __DIR__ . '/includes/dashboard/topbar.php'; ?>
+<?php 
+$page_title = "Event Coordinator Profile";
+require_once __DIR__ . '/includes/dashboard/layout_header.php'; 
+?>
 
         <div class="page-content">
             <div class="page-header">
@@ -126,31 +112,31 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
                         <h3 class="card-title">Personal Information</h3>
                     </div>
                     <form method="POST" action="coordinator_profile.php">
-                        <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+                        <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token'] ?? ''; ?>">
                         <input type="hidden" name="action" value="update_profile">
                         
                         <div class="form-group">
                             <label>Assigned Role</label>
-                            <input type="text" value="Event Coordinator" disabled style="background: rgba(0,0,0,0.02); color: var(--text-muted);">
+                            <input class="form-control" type="text" value="Event Coordinator" disabled style="background: rgba(0,0,0,0.02); color: var(--text-muted);">
                             <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 5px;">Role change requires Super Admin intervention.</p>
                         </div>
                         
                         <div class="form-group">
                             <label>Full Name *</label>
-                            <input type="text" name="full_name" value="<?php echo htmlspecialchars($user['full_name'] ?? ''); ?>" required>
+                            <input class="form-control" type="text" name="full_name" value="<?php echo htmlspecialchars($user['full_name'] ?? ''); ?>" required>
                         </div>
                         
                         <div class="form-group">
                             <label>Email Address *</label>
-                            <input type="email" name="email" value="<?php echo htmlspecialchars($user['email'] ?? ''); ?>" required>
+                            <input class="form-control" type="email" name="email" value="<?php echo htmlspecialchars($user['email'] ?? ''); ?>" required>
                         </div>
                         
                         <div class="form-group">
                             <label>Phone Number</label>
-                            <input type="text" name="phone" value="<?php echo htmlspecialchars($user['phone'] ?? ''); ?>">
+                            <input class="form-control" type="text" name="phone" value="<?php echo htmlspecialchars($user['phone'] ?? ''); ?>">
                         </div>
                         
-                        <button type="submit" class="btn-primary" style="margin-top: 10px;">Update Profile</button>
+                        <button type="submit" class="btn btn-primary">Update Profile</button>
                     </form>
                 </div>
                 
@@ -159,22 +145,22 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
                         <h3 class="card-title">Change Password</h3>
                     </div>
                     <form method="POST" action="coordinator_profile.php">
-                        <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+                        <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token'] ?? ''; ?>">
                         <input type="hidden" name="action" value="update_password">
                         
                         <div class="form-group">
                             <label>Current Password *</label>
-                            <input type="password" name="current_password" required>
+                            <input class="form-control" type="password" name="current_password" required>
                         </div>
                         
                         <div class="form-group">
                             <label>New Password *</label>
-                            <input type="password" name="new_password" required minlength="8">
+                            <input class="form-control" type="password" name="new_password" required minlength="8">
                         </div>
                         
                         <div class="form-group">
                             <label>Confirm New Password *</label>
-                            <input type="password" name="confirm_password" required minlength="8">
+                            <input class="form-control" type="password" name="confirm_password" required minlength="8">
                         </div>
                         
                         <button type="submit" class="btn-primary" style="margin-top: 10px;">Change Password</button>
@@ -183,9 +169,5 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
             </div>
             
         </div>
-    </main>
-</div>
-
-<script src="assets/js/dashboard.js"></script>
-</body>
-</html>
+    
+<?php require_once __DIR__ . '/includes/dashboard/layout_footer.php'; ?>

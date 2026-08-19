@@ -17,9 +17,9 @@ if (!defined('APP_ROOT')) { define('APP_ROOT', dirname(__DIR__)); }
         <div class="footer-links">
             <h4>Quick Links</h4>
             <ul>
-                <li><a href="#">About Us</a></li>
-                <li><a href="#">Contact</a></li>
-                <li><a href="#">Privacy Policy</a></li>
+                <li><a href="javascript:void(0)">About Us</a></li>
+                <li><a href="javascript:void(0)">Contact</a></li>
+                <li><a href="privacy.php">Privacy Policy</a></li>
             </ul>
         </div>
         <!-- Contact Placeholder -->
@@ -33,9 +33,9 @@ if (!defined('APP_ROOT')) { define('APP_ROOT', dirname(__DIR__)); }
         <p>&copy; <?php echo date('Y'); ?> Arohan Foundation. All rights reserved.</p>
         <div class="footer-social">
             <!-- Social Placeholder -->
-            <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
-            <a href="#" class="social-icon"><i class="fab fa-facebook"></i></a>
-            <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+            <a href="https://twitter.com/arohan" class="social-icon"><i class="fab fa-twitter"></i></a>
+            <a href="https://facebook.com/arohan" class="social-icon"><i class="fab fa-facebook"></i></a>
+            <a href="https://instagram.com/arohan" class="social-icon"><i class="fab fa-instagram"></i></a>
         </div>
     </div>
 </footer>

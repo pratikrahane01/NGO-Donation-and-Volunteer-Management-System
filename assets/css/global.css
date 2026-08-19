@@ -6,71 +6,81 @@
  * Version: 1.0.0
  */
 
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Manrope:wght@300;400;500;600;700;800&display=swap');
 
 :root {
-    /* Color System */
-    --primary: #2563EB;
-    --primary-hover: #1D4ED8;
-    --primary-light: #EFF6FF;
-    --secondary: #10B981;
-    --secondary-hover: #059669;
-    --accent: #F59E0B;
-    --danger: #EF4444;
+    /* Color System - Organic NGO Theme */
+    --primary: #7C9A86; /* Sage Green */
+    --primary-hover: #5A7563;
+    --primary-light: rgba(124, 154, 134, 0.1);
+    
+    --secondary: #E6B566; /* Warm Gold */
+    --secondary-hover: #C59B53;
+    
+    --accent: #E6B566;
+    --danger: #EF4444; 
+    --danger-soft: #FCA5A5; 
     --danger-hover: #DC2626;
-    --success: #10B981;
-    --warning: #F59E0B;
-    --info: #3B82F6;
+    --success: #7C9A86; /* Sage Green for success */
+    --warning: #FDBA74; 
+    --info: #9CA3AF; /* Muted gray for info to fit organic theme */
     
-    --background: #F8FAFC;
-    --surface: #FFFFFF;
-    --surface-hover: #F1F5F9;
+    --background: #F4EFE6; /* Muted Cream */
+    --surface: #FDFBF7; /* Soft Cream */
+    --surface-hover: #F7F4EE;
     
-    --text-primary: #0F172A;
-    --text-secondary: #64748B;
-    --text-tertiary: #94A3B8;
+    --text-primary: #111827;
+    --text-secondary: #4B5563;
+    --text-tertiary: #9CA3AF;
     --text-inverse: #FFFFFF;
     
-    --border-light: #F1F5F9;
-    --border: #E2E8F0;
-    --border-dark: #CBD5E1;
+    --border-light: #F3EFE9;
+    --border: #E5E7EB;
+    --border-dark: #D1D5DB;
     
-    /* Shadows */
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-    --shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+    /* Soft Layered Shadows with Sage Tint */
+    --shadow-sm: 0 1px 2px 0 rgba(124, 154, 134, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(124, 154, 134, 0.08), 0 2px 4px -1px rgba(124, 154, 134, 0.04);
+    --shadow-lg: 0 10px 15px -3px rgba(124, 154, 134, 0.1), 0 4px 6px -2px rgba(124, 154, 134, 0.05);
+    --shadow-xl: 0 20px 25px -5px rgba(124, 154, 134, 0.1), 0 10px 10px -5px rgba(124, 154, 134, 0.04);
+    --shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.02);
     
     /* Border Radius */
-    --radius-sm: 0.25rem;
-    --radius-md: 0.5rem;
-    --radius-lg: 1rem;
-    --radius-xl: 1.5rem;
+    --radius-sm: 8px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+    --radius-xl: 20px;
+    --radius-xxl: 22px;
     --radius-full: 9999px;
+    --radius-card: 20px;
+    --radius-btn: 14px;
+    --radius-input: 14px;
+    --radius-modal: 22px;
     
     /* Transitions */
     --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-normal: 300ms cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-normal: 250ms ease;
+    --transition-smooth: all 250ms ease;
+    --transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
     
     /* Animation Durations */
     --anim-duration-fast: 0.2s;
-    --anim-duration-normal: 0.4s;
-    --anim-duration-slow: 0.8s;
+    --anim-duration-normal: 0.25s;
+    --anim-duration-slow: 0.5s;
     
     /* Typography */
-    --font-family: 'Poppins', 'Segoe UI', sans-serif;
-    --h1-size: 2.5rem;
-    --h2-size: 2rem;
-    --h3-size: 1.75rem;
-    --h4-size: 1.5rem;
-    --h5-size: 1.25rem;
+    --font-heading: 'Plus Jakarta Sans', sans-serif;
+    --font-family: 'Manrope', 'Segoe UI', sans-serif;
+    --h1-size: 2.25rem;
+    --h2-size: 1.875rem;
+    --h3-size: 1.5rem;
+    --h4-size: 1.25rem;
+    --h5-size: 1.125rem;
     --h6-size: 1rem;
-    --body-size: 1rem;
+    --body-size: 0.95rem;
     --small-size: 0.875rem;
     --caption-size: 0.75rem;
-    --button-size: 1rem;
+    --button-size: 0.95rem;
     --label-size: 0.875rem;
 }
 
@@ -120,10 +130,12 @@ body {
 
 /* Typography System */
 h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
     color: var(--text-primary);
     font-weight: 600;
     line-height: 1.2;
     margin-bottom: 0.5em;
+    letter-spacing: -0.02em;
 }
 
 h1 { font-size: var(--h1-size); }
@@ -292,3 +304,6 @@ a:hover { color: var(--primary-hover); }
     background: linear-gradient(135deg, var(--primary), var(--info));
     color: var(--text-inverse);
 }
+
+/* Modal Open State */
+body.modal-open { overflow: hidden !important; }

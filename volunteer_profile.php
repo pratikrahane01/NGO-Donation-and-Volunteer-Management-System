@@ -62,35 +62,10 @@ try {
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {}
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Profile | <?php echo APP_NAME; ?></title>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="assets/css/dashboard.css">
-    <style>
-        .profile-container { display: flex; gap: 30px; flex-wrap: wrap; }
-        .profile-sidebar { flex: 1; min-width: 300px; }
-        .profile-main { flex: 2; min-width: 500px; }
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-dark); font-size: 0.9rem; }
-        .form-control { width: 100%; padding: 12px 15px; border: 1px solid rgba(0,0,0,0.1); border-radius: 8px; font-family: inherit; font-size: 0.95rem; transition: border-color 0.3s; }
-        .form-control:focus { outline: none; border-color: var(--primary); }
-        .form-control:disabled { background: rgba(0,0,0,0.02); color: var(--text-muted); cursor: not-allowed; }
-    </style>
-</head>
-<body>
-
-<div class="dashboard-layout">
-    <?php include __DIR__ . '/includes/dashboard/sidebar.php'; ?>
-    <main class="main-content">
-        <?php include __DIR__ . '/includes/dashboard/topbar.php'; ?>
+<?php 
+$page_title = "My Profile";
+require_once __DIR__ . '/includes/dashboard/layout_header.php'; 
+?>
 
         <div class="page-content">
             <div class="page-header">
@@ -113,13 +88,13 @@ try {
                         <div style="width: 120px; height: 120px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 3rem; margin: 0 auto 20px;">
                             <?php echo strtoupper(substr($user['full_name'], 0, 1)); ?>
                         </div>
-                        <h3 style="color: var(--text-dark); margin: 0 0 5px 0;"><?php echo htmlspecialchars($user['full_name']); ?></h3>
+                        <h3 style="color: var(--text-dark); margin: 0 0 5px 0;"><?php echo htmlspecialchars($user['full_name'] ?? ''); ?></h3>
                         <p style="color: var(--text-muted); margin: 0 0 20px 0; font-size: 0.9rem;">Volunteer</p>
                         
                         <div style="text-align: left; padding-top: 20px; border-top: 1px solid rgba(0,0,0,0.05);">
                             <div style="margin-bottom: 10px;">
                                 <strong style="color: var(--text-dark); font-size: 0.85rem;">Email:</strong><br>
-                                <span style="color: var(--text-muted); font-size: 0.85rem;"><?php echo htmlspecialchars($user['email']); ?></span>
+                                <span style="color: var(--text-muted); font-size: 0.85rem;"><?php echo htmlspecialchars($user['email'] ?? ''); ?></span>
                             </div>
                             <div>
                                 <strong style="color: var(--text-dark); font-size: 0.85rem;">Member Since:</strong><br>
@@ -138,7 +113,7 @@ try {
                             <div style="display: flex; gap: 20px;">
                                 <div class="form-group" style="flex: 1;">
                                     <label>Full Name</label>
-                                    <input type="text" name="full_name" class="form-control" value="<?php echo htmlspecialchars($user['full_name']); ?>" required>
+                                    <input type="text" name="full_name" class="form-control" value="<?php echo htmlspecialchars($user['full_name'] ?? ''); ?>" required>
                                 </div>
                                 <div class="form-group" style="flex: 1;">
                                     <label>Phone Number</label>
@@ -147,7 +122,7 @@ try {
                             </div>
                             <div class="form-group">
                                 <label>Email Address (Cannot be changed)</label>
-                                <input type="email" class="form-control" value="<?php echo htmlspecialchars($user['email']); ?>" disabled>
+                                <input type="email" class="form-control" value="<?php echo htmlspecialchars($user['email'] ?? ''); ?>" disabled>
                             </div>
                             <div class="form-group">
                                 <label>Bio</label>
@@ -183,10 +158,5 @@ try {
             </div>
 
         </div>
-    </main>
-</div>
-
-<script src="assets/js/dashboard.js"></script>
-
-</body>
-</html>
+    
+<?php require_once __DIR__ . '/includes/dashboard/layout_footer.php'; ?>

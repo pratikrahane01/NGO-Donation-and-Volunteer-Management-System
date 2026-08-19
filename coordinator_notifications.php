@@ -104,24 +104,10 @@ $eventsStmt->execute([$coordinator_id]);
 $myEvents = $eventsStmt->fetchAll(PDO::FETCH_ASSOC);
 
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Event Notifications | <?php echo htmlspecialchars(APP_NAME); ?></title>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="assets/css/dashboard.css">
-</head>
-<body>
-
-<div class="dashboard-layout">
-    <?php include __DIR__ . '/includes/dashboard/sidebar.php'; ?>
-
-    <main class="main-content">
-        <?php include __DIR__ . '/includes/dashboard/topbar.php'; ?>
+<?php 
+$page_title = "Event Notifications";
+require_once __DIR__ . '/includes/dashboard/layout_header.php'; 
+?>
 
         <div class="page-content">
             <div class="page-header">
@@ -151,18 +137,18 @@ $myEvents = $eventsStmt->fetchAll(PDO::FETCH_ASSOC);
                     </div>
                     
                     <form method="POST" action="coordinator_notifications.php">
-                        <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+                        <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token'] ?? ''; ?>">
                         <input type="hidden" name="action" value="send_broadcast">
                         
                         <div class="form-group">
                             <label>Target Audience *</label>
-                            <select name="target" required>
+                            <select class="form-control" name="target" required>
                                 <option value="">Select Audience...</option>
                                 <option value="all_my_volunteers">All My Volunteers (All Events)</option>
                                 <optgroup label="Specific Events">
                                     <?php foreach ($myEvents as $event): ?>
-                                        <option value="event_<?php echo $event['id']; ?>">
-                                            Event: <?php echo htmlspecialchars($event['title']); ?>
+                                        <option value="event_<?php echo $event['id'] ?? ''; ?>">
+                                            Event: <?php echo htmlspecialchars($event['title'] ?? ''); ?>
                                         </option>
                                     <?php endforeach; ?>
                                 </optgroup>
@@ -172,12 +158,12 @@ $myEvents = $eventsStmt->fetchAll(PDO::FETCH_ASSOC);
                         
                         <div class="form-group">
                             <label>Subject / Title *</label>
-                            <input type="text" name="title" required placeholder="e.g. Change in Venue Location">
+                            <input class="form-control" type="text" name="title" required placeholder="e.g. Change in Venue Location">
                         </div>
                         
                         <div class="form-group">
                             <label>Message Content *</label>
-                            <textarea name="message" rows="5" required placeholder="Type your message here..."></textarea>
+                            <textarea class="form-control" name="message" rows="5" required placeholder="Type your message here..."></textarea>
                         </div>
                         
                         <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; margin-top: 10px;">
@@ -207,9 +193,5 @@ $myEvents = $eventsStmt->fetchAll(PDO::FETCH_ASSOC);
             </div>
             
         </div>
-    </main>
-</div>
-
-<script src="assets/js/dashboard.js"></script>
-</body>
-</html>
+    
+<?php require_once __DIR__ . '/includes/dashboard/layout_footer.php'; ?>

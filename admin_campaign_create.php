@@ -46,28 +46,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Campaign | <?php echo APP_NAME; ?></title>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="assets/css/dashboard.css">
-    <style>
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; color: var(--text-dark); }
-        .form-control { width: 100%; padding: 10px; border: 1px solid rgba(0,0,0,0.1); border-radius: 8px; font-family: inherit; }
-        .alert-success { padding: 15px; background: rgba(16,185,129,0.1); color: var(--success); border-radius: 8px; margin-bottom: 20px; }
-        .alert-danger { padding: 15px; background: rgba(239,68,68,0.1); color: var(--danger); border-radius: 8px; margin-bottom: 20px; }
-    </style>
-</head>
-<body>
-<div class="dashboard-layout">
-    <?php include __DIR__ . '/includes/dashboard/sidebar.php'; ?>
-    <main class="main-content">
-        <?php include __DIR__ . '/includes/dashboard/topbar.php'; ?>
+<?php 
+$page_title = "Create Campaign";
+require_once __DIR__ . '/includes/dashboard/layout_header.php'; 
+?>
         <div class="page-content">
             <div class="page-header">
                 <div class="page-title">
@@ -89,7 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <select name="category_id" class="form-control" required>
                             <option value="">Select Category</option>
                             <?php foreach($categories as $cat): ?>
-                                <option value="<?php echo $cat['id']; ?>"><?php echo htmlspecialchars($cat['name']); ?></option>
+                                <option value="<?php echo $cat['id'] ?? ''; ?>"><?php echo htmlspecialchars($cat['name'] ?? ''); ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
@@ -116,14 +98,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </div>
                     </div>
                     <div class="form-group" style="margin-top: 20px;">
-                        <button type="submit" class="btn-primary" style="width: 100%;">Create Campaign</button>
+                        <button type="submit" class="btn btn-primary">Create Campaign</button>
                     </div>
                 </form>
                 <?php endif; ?>
             </div>
         </div>
-    </main>
-</div>
-<script src="assets/js/dashboard.js"></script>
-</body>
-</html>
+    
+<?php require_once __DIR__ . '/includes/dashboard/layout_footer.php'; ?>

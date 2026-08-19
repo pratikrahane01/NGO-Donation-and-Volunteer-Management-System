@@ -99,41 +99,10 @@ try {
     $actions = [];
 }
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enterprise Activity Logs | <?php echo htmlspecialchars(APP_NAME); ?></title>
-    
-    <!-- Premium Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Dashboard Core CSS -->
-    <link rel="stylesheet" href="assets/css/dashboard.css">
-    
-    <style>
-        .filter-bar { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
-        .filter-bar input, .filter-bar select { padding: 8px 12px; border: 1px solid rgba(0,0,0,0.1); border-radius: 6px; font-family: var(--font-body); background: white; font-size: 0.9rem; }
-        .filter-bar input:focus, .filter-bar select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 2px rgba(124, 154, 134, 0.2); }
-        .log-table th { white-space: nowrap; }
-        .log-table td { font-size: 0.9rem; vertical-align: middle; }
-        .badge-module { background: rgba(59, 130, 246, 0.1); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.2); padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: 600; }
-        .badge-action { background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.2); padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: 600; }
-        
-        .pagination { display: flex; justify-content: center; gap: 5px; margin-top: 20px; }
-        .page-btn { padding: 6px 10px; border-radius: 4px; border: 1px solid rgba(0,0,0,0.1); background: white; color: var(--text-dark); text-decoration: none; transition: all 0.2s; font-size: 0.9rem; }
-        .page-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
-    </style>
-</head>
-<body>
-
-<div class="dashboard-layout">
-    <?php include __DIR__ . '/includes/dashboard/sidebar.php'; ?>
-
-    <main class="main-content">
-        <?php include __DIR__ . '/includes/dashboard/topbar.php'; ?>
+<?php 
+$page_title = "Enterprise Activity Logs";
+require_once __DIR__ . '/includes/dashboard/layout_header.php'; 
+?>
 
         <div class="page-content">
             <!-- Header Section -->
@@ -162,18 +131,18 @@ try {
             <!-- Filter Bar -->
             <div class="glass-card" style="margin-bottom: 20px; padding: 15px 25px;">
                 <form method="GET" action="admin_activity_logs.php" class="filter-bar">
-                    <input type="text" name="search" placeholder="Search logs..." value="<?php echo htmlspecialchars($search); ?>" style="width: 200px;">
+                    <input class="form-control" type="text" name="search" placeholder="Search logs..." value="<?php echo htmlspecialchars($search); ?>" style="width: 200px;">
                     
-                    <select name="role_id">
+                    <select class="form-control" name="role_id">
                         <option value="">All Roles</option>
                         <?php foreach($roles as $r): ?>
-                            <option value="<?php echo $r['id']; ?>" <?php echo $role_filter == $r['id'] ? 'selected' : ''; ?>>
-                                <?php echo htmlspecialchars($r['role_name']); ?>
+                            <option value="<?php echo $r['id'] ?? ''; ?>" <?php echo $role_filter == $r['id'] ? 'selected' : ''; ?>>
+                                <?php echo htmlspecialchars($r['role_name'] ?? ''); ?>
                             </option>
                         <?php endforeach; ?>
                     </select>
 
-                    <select name="module">
+                    <select class="form-control" name="module">
                         <option value="">All Modules</option>
                         <?php foreach($modules as $m): ?>
                             <option value="<?php echo htmlspecialchars($m); ?>" <?php echo $module_filter === $m ? 'selected' : ''; ?>>
@@ -182,7 +151,7 @@ try {
                         <?php endforeach; ?>
                     </select>
 
-                    <select name="action">
+                    <select class="form-control" name="action">
                         <option value="">All Actions</option>
                         <?php foreach($actions as $a): ?>
                             <option value="<?php echo htmlspecialchars($a); ?>" <?php echo $action_filter === $a ? 'selected' : ''; ?>>
@@ -191,8 +160,8 @@ try {
                         <?php endforeach; ?>
                     </select>
                     
-                    <input type="date" name="start_date" value="<?php echo htmlspecialchars($start_date); ?>" title="Start Date">
-                    <input type="date" name="end_date" value="<?php echo htmlspecialchars($end_date); ?>" title="End Date">
+                    <input class="form-control" type="date" name="start_date" value="<?php echo htmlspecialchars($start_date); ?>" title="Start Date">
+                    <input class="form-control" type="date" name="end_date" value="<?php echo htmlspecialchars($end_date); ?>" title="End Date">
 
                     <button type="submit" class="btn-primary" style="padding: 8px 15px;"><i class="fas fa-filter"></i> Apply</button>
                     <a href="admin_activity_logs.php" class="btn-primary" style="padding: 8px 15px; background: rgba(0,0,0,0.05); color: var(--text-dark); text-decoration: none;"><i class="fas fa-undo"></i> Reset</a>
@@ -229,29 +198,29 @@ try {
                                     </td>
                                     <td>
                                         <?php if($log['full_name']): ?>
-                                            <div style="font-weight: 600; color: var(--text-dark);"><?php echo htmlspecialchars($log['full_name']); ?></div>
-                                            <div style="font-size: 0.8rem; color: var(--text-muted);"><?php echo htmlspecialchars($log['email']); ?></div>
+                                            <div style="font-weight: 600; color: var(--text-dark);"><?php echo htmlspecialchars($log['full_name'] ?? ''); ?></div>
+                                            <div style="font-size: 0.8rem; color: var(--text-muted);"><?php echo htmlspecialchars($log['email'] ?? ''); ?></div>
                                         <?php else: ?>
                                             <span style="color: var(--text-muted); font-style: italic;">System / Guest</span>
                                         <?php endif; ?>
                                     </td>
                                     <td>
                                         <?php if($log['role_name']): ?>
-                                            <span class="badge badge-primary"><?php echo htmlspecialchars($log['role_name']); ?></span>
+                                            <span class="badge badge-primary"><?php echo htmlspecialchars($log['role_name'] ?? ''); ?></span>
                                         <?php else: ?>
                                             -
                                         <?php endif; ?>
                                     </td>
                                     <td>
-                                        <span class="badge-module"><?php echo htmlspecialchars($log['module']); ?></span>
-                                        <span class="badge-action" style="margin-left: 5px;"><?php echo htmlspecialchars($log['action']); ?></span>
+                                        <span class="badge-module"><?php echo htmlspecialchars($log['module'] ?? ''); ?></span>
+                                        <span class="badge-action" style="margin-left: 5px;"><?php echo htmlspecialchars($log['action'] ?? ''); ?></span>
                                     </td>
                                     <td style="max-width: 250px;">
                                         <?php echo htmlspecialchars($log['description'] ?? '-'); ?>
                                     </td>
                                     <td style="color: var(--text-muted);">
-                                        <?php echo htmlspecialchars($log['ip_address']); ?><br>
-                                        <small title="<?php echo htmlspecialchars($log['user_agent']); ?>">
+                                        <?php echo htmlspecialchars($log['ip_address'] ?? ''); ?><br>
+                                        <small title="<?php echo htmlspecialchars($log['user_agent'] ?? ''); ?>">
                                             <?php echo htmlspecialchars($log['device'] ?? 'Unknown'); ?> - <?php echo htmlspecialchars($log['browser'] ?? 'Unknown'); ?>
                                         </small>
                                     </td>
@@ -289,9 +258,5 @@ try {
                 <?php endif; ?>
             </div>
         </div>
-    </main>
-</div>
-
-<script src="assets/js/dashboard.js"></script>
-</body>
-</html>
+    
+<?php require_once __DIR__ . '/includes/dashboard/layout_footer.php'; ?>

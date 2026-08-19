@@ -28,24 +28,10 @@ if (isset($_GET['action'])) {
 
 $notifications = getDonorAllNotifications($pdo, $donor_id);
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Notifications | <?php echo APP_NAME; ?></title>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="assets/css/dashboard.css">
-</head>
-<body>
-<div class="dashboard-layout">
-    <?php include __DIR__ . '/includes/dashboard/sidebar.php'; ?>
-    <main class="main-content">
-        <?php include __DIR__ . '/includes/dashboard/topbar.php'; ?>
+<?php 
+$page_title = "My Notifications";
+require_once __DIR__ . '/includes/dashboard/layout_header.php'; 
+?>
         <div class="page-content">
             
             <div class="page-header" style="display: flex; justify-content: space-between; align-items: center;">
@@ -78,20 +64,20 @@ $notifications = getDonorAllNotifications($pdo, $donor_id);
                             </div>
                             <div>
                                 <h4 style="margin: 0 0 5px 0; color: var(--text-dark); font-size: 1.1rem;">
-                                    <?php echo htmlspecialchars($notif['title']); ?>
+                                    <?php echo htmlspecialchars($notif['title'] ?? ''); ?>
                                 </h4>
                                 <p style="margin: 0 0 10px 0; color: var(--text-body); font-size: 0.95rem; line-height: 1.5;">
-                                    <?php echo htmlspecialchars($notif['message']); ?>
+                                    <?php echo htmlspecialchars($notif['message'] ?? ''); ?>
                                 </p>
                                 <span style="font-size: 0.8rem; color: var(--text-muted);">
                                     <i class="far fa-clock"></i> <?php echo date('M d, Y g:i A', strtotime($notif['created_at'])); ?>
-                                    &bull; <strong><?php echo htmlspecialchars($notif['notification_type']); ?></strong>
+                                    &bull; <strong><?php echo htmlspecialchars($notif['notification_type'] ?? ''); ?></strong>
                                 </span>
                             </div>
                         </div>
                         <?php if ($isUnread): ?>
                             <div>
-                                <a href="donor_notifications.php?action=mark_read&id=<?php echo $notif['id']; ?>" title="Mark as Read" style="color: var(--primary); width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.05); text-decoration: none;">
+                                <a href="donor_notifications.php?action=mark_read&id=<?php echo $notif['id'] ?? ''; ?>" title="Mark as Read" style="color: var(--primary); width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.05); text-decoration: none;">
                                     <i class="fas fa-check"></i>
                                 </a>
                             </div>
@@ -102,8 +88,5 @@ $notifications = getDonorAllNotifications($pdo, $donor_id);
             </div>
 
         </div>
-    </main>
-</div>
-<script src="assets/js/dashboard.js"></script>
-</body>
-</html>
+    
+<?php require_once __DIR__ . '/includes/dashboard/layout_footer.php'; ?>

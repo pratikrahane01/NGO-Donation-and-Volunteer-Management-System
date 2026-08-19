@@ -87,7 +87,7 @@ class InstalledVersions
 
         foreach (self::getInstalled() as $installed) {
             foreach ($installed['versions'] as $name => $package) {
-                if (isset($package['type']) && $package['type'] === $type) {
+                if (isset($package['type']) && ($package['type'] ?? '') === $type) {
                     $packagesByType[] = $name;
                 }
             }

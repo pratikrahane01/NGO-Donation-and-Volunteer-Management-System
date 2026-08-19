@@ -25,40 +25,10 @@ $activity = $data['recent_activity'];
 // Helper to convert arrays to JS for charts
 function toJson($arr) { return json_encode($arr); }
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Central Analytics | <?php echo APP_NAME; ?></title>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="assets/css/dashboard.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        .analytics-section { margin-bottom: 3rem; }
-        .section-title { font-size: 1.5rem; color: var(--text-dark); margin-bottom: 1.5rem; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; }
-        .chart-container { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); position: relative; height: 350px; width: 100%; }
-        .chart-container.pie { height: 300px; }
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-        @media (max-width: 992px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
-        .report-card { background: white; border-radius: 10px; padding: 20px; text-align: center; border: 1px solid #e2e8f0; transition: all 0.2s; }
-        .report-card:hover { border-color: var(--primary); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        .report-icon { font-size: 2.5rem; color: var(--primary); margin-bottom: 15px; }
-        .export-btns { display: flex; gap: 10px; justify-content: center; margin-top: 15px; }
-        .export-btns a { font-size: 0.8rem; padding: 4px 10px; border-radius: 4px; text-decoration: none; background: #f1f5f9; color: var(--text-muted); }
-        .export-btns a:hover { background: var(--primary); color: white; }
-    </style>
-</head>
-<body>
-<div class="dashboard-layout">
-    <?php include __DIR__ . '/includes/dashboard/sidebar.php'; ?>
-    <main class="main-content">
-        <?php include __DIR__ . '/includes/dashboard/topbar.php'; ?>
+<?php 
+$page_title = "Central Analytics";
+require_once __DIR__ . '/includes/dashboard/layout_header.php'; 
+?>
         <div class="page-content">
             
             <div class="page-header">
@@ -127,7 +97,7 @@ function toJson($arr) { return json_encode($arr); }
                         <?php foreach($camp['top_campaigns'] as $c): ?>
                             <div style="margin-bottom: 15px;">
                                 <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 5px;">
-                                    <strong><?php echo htmlspecialchars($c['name']); ?></strong>
+                                    <strong><?php echo htmlspecialchars($c['name'] ?? ''); ?></strong>
                                     <span style="color:var(--text-muted);"><?php echo formatIndianCurrency($c['collected_amount']); ?> / <?php echo formatIndianCurrency($c['target_amount']); ?></span>
                                 </div>
                                 <div style="height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden;">
@@ -198,8 +168,8 @@ function toJson($arr) { return json_encode($arr); }
                         <h3>Financial Report</h3>
                         <p style="font-size: 0.85rem; color: var(--text-muted);">Complete ledger of all donations, receipts, and campaign disbursements.</p>
                         <div class="export-btns">
-                            <a href="#" onclick="alert('PDF Export Generation Initiated (Placeholder)')">PDF</a>
-                            <a href="#" onclick="alert('CSV Export Generation Initiated (Placeholder)')">CSV</a>
+                            <a href="javascript:void(0)" onclick="alert('PDF Export Generation Initiated (Placeholder)')">PDF</a>
+                            <a href="javascript:void(0)" onclick="alert('CSV Export Generation Initiated (Placeholder)')">CSV</a>
                         </div>
                     </div>
                     <div class="report-card">
@@ -207,8 +177,8 @@ function toJson($arr) { return json_encode($arr); }
                         <h3>Volunteer Report</h3>
                         <p style="font-size: 0.85rem; color: var(--text-muted);">Attendance records, hours contributed, and task completion rates.</p>
                         <div class="export-btns">
-                            <a href="#" onclick="alert('PDF Export Generation Initiated (Placeholder)')">PDF</a>
-                            <a href="#" onclick="alert('Excel Export Generation Initiated (Placeholder)')">Excel</a>
+                            <a href="javascript:void(0)" onclick="alert('PDF Export Generation Initiated (Placeholder)')">PDF</a>
+                            <a href="javascript:void(0)" onclick="alert('Excel Export Generation Initiated (Placeholder)')">Excel</a>
                         </div>
                     </div>
                     <div class="report-card">
@@ -216,8 +186,8 @@ function toJson($arr) { return json_encode($arr); }
                         <h3>Event Report</h3>
                         <p style="font-size: 0.85rem; color: var(--text-muted);">Past and upcoming events, coordinators, and expected budgets.</p>
                         <div class="export-btns">
-                            <a href="#" onclick="alert('PDF Export Generation Initiated (Placeholder)')">PDF</a>
-                            <a href="#" onclick="alert('CSV Export Generation Initiated (Placeholder)')">CSV</a>
+                            <a href="javascript:void(0)" onclick="alert('PDF Export Generation Initiated (Placeholder)')">PDF</a>
+                            <a href="javascript:void(0)" onclick="alert('CSV Export Generation Initiated (Placeholder)')">CSV</a>
                         </div>
                     </div>
                 </div>
@@ -233,12 +203,12 @@ function toJson($arr) { return json_encode($arr); }
                         <div class="activity-timeline">
                             <?php foreach($activity as $act): ?>
                                 <div class="timeline-item" style="display: flex; gap: 15px; margin-bottom: 15px;">
-                                    <div class="timeline-icon" style="width: 35px; height: 35px; border-radius: 50%; background: <?php echo $act['color']; ?>20; color: <?php echo $act['color']; ?>; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                                        <i class="<?php echo $act['icon']; ?>"></i>
+                                    <div class="timeline-icon" style="width: 35px; height: 35px; border-radius: 50%; background: <?php echo $act['color'] ?? ''; ?>20; color: <?php echo $act['color'] ?? ''; ?>; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                        <i class="<?php echo $act['icon'] ?? ''; ?>"></i>
                                     </div>
                                     <div class="timeline-content">
-                                        <strong style="color: var(--text-dark); display: block; font-size: 0.9rem;"><?php echo htmlspecialchars($act['title']); ?></strong>
-                                        <span style="font-size: 0.75rem; color: var(--text-muted);"><i class="far fa-clock"></i> <?php echo date('M d, Y g:i A', strtotime($act['event_date'])); ?> &bull; <?php echo htmlspecialchars($act['module']); ?></span>
+                                        <strong style="color: var(--text-dark); display: block; font-size: 0.9rem;"><?php echo htmlspecialchars($act['title'] ?? ''); ?></strong>
+                                        <span style="font-size: 0.75rem; color: var(--text-muted);"><i class="far fa-clock"></i> <?php echo date('M d, Y g:i A', strtotime($act['event_date'])); ?> &bull; <?php echo htmlspecialchars($act['module'] ?? ''); ?></span>
                                     </div>
                                 </div>
                             <?php endforeach; ?>
@@ -248,10 +218,7 @@ function toJson($arr) { return json_encode($arr); }
             </div>
 
         </div>
-    </main>
-</div>
-
-<script>
+    <script>
     // Chart Defaults
     Chart.defaults.font.family = "'Manrope', sans-serif";
     Chart.defaults.color = "#64748b";
@@ -364,6 +331,4 @@ function toJson($arr) { return json_encode($arr); }
         });
     }
 </script>
-<script src="assets/js/dashboard.js"></script>
-</body>
-</html>
+<?php require_once __DIR__ . '/includes/dashboard/layout_footer.php'; ?>

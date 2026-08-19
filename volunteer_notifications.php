@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     }
 }
 
-if (isset($_GET['action']) && $_GET['action'] === 'mark_all_read') {
+if (isset($_GET['action']) && ($_GET['action'] ?? '') === 'mark_all_read') {
     $stmt = $pdo->prepare("UPDATE notifications SET read_status = 1 WHERE recipient_id = ? AND role_id = ? AND read_status = 0");
     $stmt->execute([$volunteer_id, $_SESSION['role_id']]);
     header("Location: volunteer_notifications.php");
@@ -41,35 +41,10 @@ try {
     $notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {}
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Notifications | <?php echo APP_NAME; ?></title>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="assets/css/dashboard.css">
-    <style>
-        .notification-item { padding: 20px; border-bottom: 1px solid rgba(0,0,0,0.05); display: flex; gap: 20px; align-items: flex-start; transition: all 0.3s ease; }
-        .notification-item:hover { background: rgba(0,0,0,0.01); }
-        .notification-item.unread { background: rgba(124,154,134,0.05); }
-        .notification-icon { width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
-        
-        .icon-event { background: rgba(59,130,246,0.1); color: var(--info); }
-        .icon-system { background: rgba(107,114,128,0.1); color: var(--text-muted); }
-        .icon-default { background: rgba(124,154,134,0.1); color: var(--primary); }
-    </style>
-</head>
-<body>
-
-<div class="dashboard-layout">
-    <?php include __DIR__ . '/includes/dashboard/sidebar.php'; ?>
-    <main class="main-content">
-        <?php include __DIR__ . '/includes/dashboard/topbar.php'; ?>
+<?php 
+$page_title = "Notifications";
+require_once __DIR__ . '/includes/dashboard/layout_header.php'; 
+?>
 
         <div class="page-content">
             <div class="page-header" style="display: flex; justify-content: space-between; align-items: center;">
@@ -98,20 +73,20 @@ try {
                         if (strtolower($notif['notification_type']) == 'event') { $iconClass = 'icon-event'; $icon = 'far fa-calendar-alt'; }
                         elseif (strtolower($notif['notification_type']) == 'system') { $iconClass = 'icon-system'; $icon = 'fas fa-cog'; }
                     ?>
-                        <div class="notification-item <?php echo $notif['read_status'] == 0 ? 'unread' : ''; ?>">
+                        <div class="notification-item <?php echo ($notif['read_status'] ?? '') == 0 ? 'unread' : ''; ?>">
                             <div class="notification-icon <?php echo $iconClass; ?>">
                                 <i class="<?php echo $icon; ?>"></i>
                             </div>
                             <div style="flex: 1;">
                                 <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                                    <strong style="color: var(--text-dark); display: block; font-size: 1.05rem; margin-bottom: 5px;"><?php echo htmlspecialchars($notif['title']); ?></strong>
+                                    <strong style="color: var(--text-dark); display: block; font-size: 1.05rem; margin-bottom: 5px;"><?php echo htmlspecialchars($notif['title'] ?? ''); ?></strong>
                                     <span style="font-size: 0.8rem; color: var(--text-muted);"><i class="far fa-clock"></i> <?php echo date('M d, g:i A', strtotime($notif['created_at'])); ?></span>
                                 </div>
-                                <p style="font-size: 0.95rem; color: var(--text-body); margin: 0 0 10px 0; line-height: 1.5;"><?php echo htmlspecialchars($notif['message']); ?></p>
+                                <p style="font-size: 0.95rem; color: var(--text-body); margin: 0 0 10px 0; line-height: 1.5;"><?php echo htmlspecialchars($notif['message'] ?? ''); ?></p>
                                 
                                 <?php if ($notif['read_status'] == 0): ?>
                                     <form method="POST">
-                                        <input type="hidden" name="notification_id" value="<?php echo $notif['id']; ?>">
+                                        <input type="hidden" name="notification_id" value="<?php echo $notif['id'] ?? ''; ?>">
                                         <button type="submit" name="action" value="mark_read" style="background: none; border: none; color: var(--primary); font-size: 0.85rem; font-weight: 600; cursor: pointer; padding: 0;"><i class="fas fa-check"></i> Mark as read</button>
                                     </form>
                                 <?php endif; ?>
@@ -122,10 +97,5 @@ try {
             </div>
 
         </div>
-    </main>
-</div>
-
-<script src="assets/js/dashboard.js"></script>
-
-</body>
-</html>
+    
+<?php require_once __DIR__ . '/includes/dashboard/layout_footer.php'; ?>

@@ -48,28 +48,10 @@ if (!empty($query)) {
 
 $total_results = count($results['users']) + count($results['campaigns']) + count($results['donations']) + count($results['events']);
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Search Results | <?php echo APP_NAME; ?></title>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="assets/css/dashboard.css">
-    <style>
-        .result-group { margin-bottom: 30px; }
-        .result-group h3 { font-size: 1.1rem; color: var(--primary); margin-bottom: 15px; border-bottom: 1px solid rgba(0,0,0,0.1); padding-bottom: 5px; }
-        .result-item { padding: 15px; background: rgba(0,0,0,0.02); border-radius: 8px; margin-bottom: 10px; border-left: 4px solid var(--primary); }
-        .result-item a { text-decoration: none; color: inherit; display: block; }
-        .result-item:hover { background: rgba(0,0,0,0.05); }
-    </style>
-</head>
-<body>
-<div class="dashboard-layout">
-    <?php include __DIR__ . '/includes/dashboard/sidebar.php'; ?>
-    <main class="main-content">
-        <?php include __DIR__ . '/includes/dashboard/topbar.php'; ?>
+<?php 
+$page_title = "Search Results";
+require_once __DIR__ . '/includes/dashboard/layout_header.php'; 
+?>
         <div class="page-content">
             <div class="page-header">
                 <div class="page-title">
@@ -95,8 +77,8 @@ $total_results = count($results['users']) + count($results['campaigns']) + count
                         <?php foreach($results['users'] as $item): ?>
                             <div class="result-item">
                                 <a href="admin_users.php">
-                                    <strong><?php echo htmlspecialchars($item['name']); ?></strong>
-                                    <p style="font-size: 0.85rem; color: var(--text-muted); margin: 5px 0 0;"><?php echo htmlspecialchars($item['detail']); ?></p>
+                                    <strong><?php echo htmlspecialchars($item['name'] ?? ''); ?></strong>
+                                    <p style="font-size: 0.85rem; color: var(--text-muted); margin: 5px 0 0;"><?php echo htmlspecialchars($item['detail'] ?? ''); ?></p>
                                 </a>
                             </div>
                         <?php endforeach; ?>
@@ -109,8 +91,8 @@ $total_results = count($results['users']) + count($results['campaigns']) + count
                         <?php foreach($results['campaigns'] as $item): ?>
                             <div class="result-item">
                                 <a href="admin_campaigns.php">
-                                    <strong><?php echo htmlspecialchars($item['name']); ?></strong>
-                                    <p style="font-size: 0.85rem; color: var(--text-muted); margin: 5px 0 0;"><?php echo htmlspecialchars($item['detail']); ?></p>
+                                    <strong><?php echo htmlspecialchars($item['name'] ?? ''); ?></strong>
+                                    <p style="font-size: 0.85rem; color: var(--text-muted); margin: 5px 0 0;"><?php echo htmlspecialchars($item['detail'] ?? ''); ?></p>
                                 </a>
                             </div>
                         <?php endforeach; ?>
@@ -123,8 +105,8 @@ $total_results = count($results['users']) + count($results['campaigns']) + count
                         <?php foreach($results['donations'] as $item): ?>
                             <div class="result-item">
                                 <a href="admin_donations.php">
-                                    <strong>Transaction: <?php echo htmlspecialchars($item['name']); ?></strong>
-                                    <p style="font-size: 0.85rem; color: var(--text-muted); margin: 5px 0 0;"><?php echo htmlspecialchars($item['detail']); ?></p>
+                                    <strong>Transaction: <?php echo htmlspecialchars($item['name'] ?? ''); ?></strong>
+                                    <p style="font-size: 0.85rem; color: var(--text-muted); margin: 5px 0 0;"><?php echo htmlspecialchars($item['detail'] ?? ''); ?></p>
                                 </a>
                             </div>
                         <?php endforeach; ?>
@@ -137,8 +119,8 @@ $total_results = count($results['users']) + count($results['campaigns']) + count
                         <?php foreach($results['events'] as $item): ?>
                             <div class="result-item">
                                 <a href="admin_events.php">
-                                    <strong><?php echo htmlspecialchars($item['name']); ?></strong>
-                                    <p style="font-size: 0.85rem; color: var(--text-muted); margin: 5px 0 0;"><?php echo htmlspecialchars($item['detail']); ?></p>
+                                    <strong><?php echo htmlspecialchars($item['name'] ?? ''); ?></strong>
+                                    <p style="font-size: 0.85rem; color: var(--text-muted); margin: 5px 0 0;"><?php echo htmlspecialchars($item['detail'] ?? ''); ?></p>
                                 </a>
                             </div>
                         <?php endforeach; ?>
@@ -148,8 +130,5 @@ $total_results = count($results['users']) + count($results['campaigns']) + count
                 <?php endif; ?>
             </div>
         </div>
-    </main>
-</div>
-<script src="assets/js/dashboard.js"></script>
-</body>
-</html>
+    
+<?php require_once __DIR__ . '/includes/dashboard/layout_footer.php'; ?>

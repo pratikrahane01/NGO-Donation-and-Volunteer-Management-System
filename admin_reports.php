@@ -95,139 +95,10 @@ foreach ($monthlyDonations as $md) {
 }
 
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reports & Analytics | <?php echo htmlspecialchars(APP_NAME); ?></title>
-    
-    <!-- Premium Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Dashboard Core CSS -->
-    <link rel="stylesheet" href="assets/css/dashboard.css">
-    
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
-    <style>
-        .filter-bar {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 25px;
-            align-items: flex-end;
-            background: white;
-            padding: 15px 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
-            border: 1px solid rgba(0,0,0,0.05);
-        }
-        .filter-group {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-        .filter-group label {
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: var(--text-muted);
-        }
-        .filter-bar input {
-            padding: 10px 15px;
-            border: 1px solid rgba(0,0,0,0.1);
-            border-radius: 8px;
-            font-family: var(--font-body);
-            background: #f9f9f9;
-        }
-        
-        .summary-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            margin-bottom: 25px;
-        }
-        .summary-card {
-            background: white;
-            padding: 25px;
-            border-radius: 16px;
-            border: 1px solid rgba(0,0,0,0.05);
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
-        }
-        .summary-icon {
-            width: 60px;
-            height: 60px;
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-        }
-        
-        .chart-container {
-            background: white;
-            padding: 25px;
-            border-radius: 16px;
-            border: 1px solid rgba(0,0,0,0.05);
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
-            margin-bottom: 25px;
-        }
-        
-        .tables-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 25px;
-        }
-        .data-card {
-            background: white;
-            border-radius: 16px;
-            border: 1px solid rgba(0,0,0,0.05);
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
-            overflow: hidden;
-        }
-        .data-header {
-            padding: 20px;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-            font-weight: 700;
-            font-size: 1.1rem;
-            color: var(--text-dark);
-            background: #fafafa;
-        }
-        .data-list {
-            padding: 0;
-            margin: 0;
-            list-style: none;
-        }
-        .data-list li {
-            padding: 15px 20px;
-            border-bottom: 1px solid rgba(0,0,0,0.03);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .data-list li:last-child {
-            border-bottom: none;
-        }
-        
-        @media (max-width: 992px) {
-            .summary-grid { grid-template-columns: 1fr; }
-            .tables-grid { grid-template-columns: 1fr; }
-        }
-    </style>
-</head>
-<body>
-
-<div class="dashboard-layout">
-    <!-- Sidebar -->
-    <?php include __DIR__ . '/includes/dashboard/sidebar.php'; ?>
-
-    <main class="main-content">
-        <!-- Topbar -->
-        <?php include __DIR__ . '/includes/dashboard/topbar.php'; ?>
+<?php 
+$page_title = "Reports & Analytics";
+require_once __DIR__ . '/includes/dashboard/layout_header.php'; 
+?>
 
         <div class="page-content">
             <!-- Header Section -->
@@ -251,11 +122,11 @@ foreach ($monthlyDonations as $md) {
             <form method="GET" action="admin_reports.php" class="filter-bar print-hide">
                 <div class="filter-group">
                     <label>From Date</label>
-                    <input type="date" name="start_date" value="<?php echo htmlspecialchars($start_date); ?>" required>
+                    <input class="form-control" type="date" name="start_date" value="<?php echo htmlspecialchars($start_date); ?>" required>
                 </div>
                 <div class="filter-group">
                     <label>To Date</label>
-                    <input type="date" name="end_date" value="<?php echo htmlspecialchars($end_date); ?>" required>
+                    <input class="form-control" type="date" name="end_date" value="<?php echo htmlspecialchars($end_date); ?>" required>
                 </div>
                 <button type="submit" class="btn-primary" style="padding: 10px 20px;"><i class="fas fa-sync-alt"></i> Update Report</button>
             </form>
@@ -309,8 +180,8 @@ foreach ($monthlyDonations as $md) {
                             <?php foreach($topCampaigns as $tc): ?>
                                 <li>
                                     <div>
-                                        <div style="font-weight: 600; color: var(--text-dark);"><?php echo htmlspecialchars($tc['name']); ?></div>
-                                        <div style="font-size: 0.8rem; color: var(--text-muted);"><?php echo $tc['donation_count']; ?> donations</div>
+                                        <div style="font-weight: 600; color: var(--text-dark);"><?php echo htmlspecialchars($tc['name'] ?? ''); ?></div>
+                                        <div style="font-size: 0.8rem; color: var(--text-muted);"><?php echo $tc['donation_count'] ?? ''; ?> donations</div>
                                     </div>
                                     <div style="font-weight: 700; color: var(--success);">
                                         <?php echo formatIndianCurrency($tc['total_raised']); ?>
@@ -331,7 +202,7 @@ foreach ($monthlyDonations as $md) {
                             <?php foreach($topVolunteers as $tv): ?>
                                 <li>
                                     <div style="font-weight: 600; color: var(--text-dark);">
-                                        <?php echo htmlspecialchars($tv['full_name']); ?>
+                                        <?php echo htmlspecialchars($tv['full_name'] ?? ''); ?>
                                     </div>
                                     <div style="font-weight: 700; color: var(--primary);">
                                         <?php echo round($tv['total_hours'], 1); ?> Hrs
@@ -344,11 +215,7 @@ foreach ($monthlyDonations as $md) {
             </div>
             
         </div>
-    </main>
-</div>
-
-<script src="assets/js/dashboard.js"></script>
-<script>
+    <script>
     // Initialize Chart
     const ctx = document.getElementById('donationChart').getContext('2d');
     
@@ -397,16 +264,4 @@ foreach ($monthlyDonations as $md) {
         }
     });
 </script>
-
-<style>
-    @media print {
-        .dashboard-layout .sidebar, .dashboard-layout .topbar, .print-hide, .header-actions {
-            display: none !important;
-        }
-        .main-content { margin-left: 0 !important; padding: 0 !important; }
-        .page-content { padding: 0 !important; }
-        .chart-container canvas { width: 100% !important; }
-    }
-</style>
-</body>
-</html>
+<?php require_once __DIR__ . '/includes/dashboard/layout_footer.php'; ?>

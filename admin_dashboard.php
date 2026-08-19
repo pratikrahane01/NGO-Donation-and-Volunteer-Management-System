@@ -27,33 +27,10 @@ $chartData = get_chart_data($pdo);
 $chartLabelsJSON = json_encode($chartData['labels']);
 $chartAmountsJSON = json_encode($chartData['amounts']);
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Super Admin Dashboard | <?php echo htmlspecialchars(APP_NAME); ?></title>
-    
-    <!-- Premium Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Dashboard Core CSS -->
-    <link rel="stylesheet" href="assets/css/dashboard.css">
-    
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
-<body>
-
-<div class="dashboard-layout">
-    
-    <!-- Premium Sidebar -->
-    <?php include __DIR__ . '/includes/dashboard/sidebar.php'; ?>
-
-    <main class="main-content">
-        <!-- Sticky Topbar -->
-        <?php include __DIR__ . '/includes/dashboard/topbar.php'; ?>
+<?php 
+$page_title = "Super Admin Dashboard";
+require_once __DIR__ . '/includes/dashboard/layout_header.php'; 
+?>
 
         <div class="page-content">
             <!-- Header Section -->
@@ -198,13 +175,13 @@ $chartAmountsJSON = json_encode($chartData['amounts']);
                                     <tr>
                                         <td>
                                             <a href="admin_users.php" style="text-decoration: none;">
-                                                <strong style="color: var(--text-dark); display:block;"><?php echo htmlspecialchars($user['full_name']); ?></strong>
-                                                <span style="font-size: 0.75rem; color: var(--text-muted);"><?php echo htmlspecialchars($user['email']); ?></span>
+                                                <strong style="color: var(--text-dark); display:block;"><?php echo htmlspecialchars($user['full_name'] ?? ''); ?></strong>
+                                                <span style="font-size: 0.75rem; color: var(--text-muted);"><?php echo htmlspecialchars($user['email'] ?? ''); ?></span>
                                             </a>
                                         </td>
                                         <td><span style="font-size: 0.8rem; font-weight: 600; color: var(--primary-dark);"><?php echo htmlspecialchars($user['role_name'] ?? 'User'); ?></span></td>
                                         <td>
-                                            <span class="status-badge <?php echo $user['status'] == 'active' ? 'status-active' : 'status-inactive'; ?>">
+                                            <span class="status-badge <?php echo ($user['status'] ?? '') == 'active' ? 'status-active' : 'status-inactive'; ?>">
                                                 <?php echo ucfirst($user['status']); ?>
                                             </span>
                                         </td>
@@ -239,17 +216,17 @@ $chartAmountsJSON = json_encode($chartData['amounts']);
                                 <tbody>
                                     <?php foreach($latestCampaigns as $camp): ?>
                                     <tr>
-                                        <td><a href="admin_campaigns.php" style="text-decoration: none;"><strong style="color: var(--text-dark);"><?php echo htmlspecialchars($camp['name']); ?></strong></a></td>
+                                        <td><a href="admin_campaigns.php" style="text-decoration: none;"><strong style="color: var(--text-dark);"><?php echo htmlspecialchars($camp['name'] ?? ''); ?></strong></a></td>
                                         <td style="width: 40%;">
                                             <div style="display: flex; justify-content: space-between; font-size: 0.75rem; margin-bottom: 5px; font-weight: 600;">
                                                 <span style="color: var(--primary);"><?php echo formatIndianCurrency($camp['collected_amount']); ?></span>
                                                 <span style="color: var(--text-muted);"><?php echo formatIndianCurrency($camp['target_amount']); ?></span>
                                             </div>
                                             <div style="height: 6px; width: 100%; background: rgba(0,0,0,0.05); border-radius: 3px; overflow: hidden;">
-                                                <div style="height: 100%; background: var(--primary); width: <?php echo htmlspecialchars($camp['goal_completed_percentage']); ?>%;"></div>
+                                                <div style="height: 100%; background: var(--primary); width: <?php echo htmlspecialchars($camp['goal_completed_percentage'] ?? ''); ?>%;"></div>
                                             </div>
                                         </td>
-                                        <td><span class="status-badge <?php echo $camp['status'] == 'active' ? 'status-active' : 'status-pending'; ?>"><?php echo ucfirst($camp['status']); ?></span></td>
+                                        <td><span class="status-badge <?php echo ($camp['status'] ?? '') == 'active' ? 'status-active' : 'status-pending'; ?>"><?php echo ucfirst($camp['status']); ?></span></td>
                                     </tr>
                                     <?php endforeach; ?>
                                 </tbody>
@@ -278,12 +255,12 @@ $chartAmountsJSON = json_encode($chartData['amounts']);
                                 <tbody>
                                     <?php foreach($upcomingEvents as $evt): ?>
                                     <tr>
-                                        <td><a href="admin_events.php" style="text-decoration: none;"><strong style="color: var(--text-dark);"><?php echo htmlspecialchars($evt['title']); ?></strong></a></td>
+                                        <td><a href="admin_events.php" style="text-decoration: none;"><strong style="color: var(--text-dark);"><?php echo htmlspecialchars($evt['title'] ?? ''); ?></strong></a></td>
                                         <td>
                                             <div style="font-size: 0.85rem; color: var(--text-dark); font-weight: 600;"><?php echo date('M d, Y', strtotime($evt['event_date'])); ?></div>
                                             <div style="font-size: 0.75rem; color: var(--text-muted);"><?php echo date('g:i A', strtotime($evt['event_time'])); ?></div>
                                         </td>
-                                        <td><span style="font-size: 0.85rem; color: var(--text-muted);"><i class="fas fa-map-marker-alt"></i> <?php echo htmlspecialchars($evt['venue']); ?></span></td>
+                                        <td><span style="font-size: 0.85rem; color: var(--text-muted);"><i class="fas fa-map-marker-alt"></i> <?php echo htmlspecialchars($evt['venue'] ?? ''); ?></span></td>
                                     </tr>
                                     <?php endforeach; ?>
                                 </tbody>
@@ -315,8 +292,8 @@ $chartAmountsJSON = json_encode($chartData['amounts']);
                                             <i class="fas fa-bell"></i>
                                         </div>
                                         <div>
-                                            <strong style="color: var(--text-dark); display: block; font-size: 0.95rem;"><?php echo htmlspecialchars($notif['title']); ?></strong>
-                                            <p style="font-size: 0.85rem; color: var(--text-body); margin: 4px 0;"><?php echo htmlspecialchars($notif['message']); ?></p>
+                                            <strong style="color: var(--text-dark); display: block; font-size: 0.95rem;"><?php echo htmlspecialchars($notif['title'] ?? ''); ?></strong>
+                                            <p style="font-size: 0.85rem; color: var(--text-body); margin: 4px 0;"><?php echo htmlspecialchars($notif['message'] ?? ''); ?></p>
                                             <span style="font-size: 0.75rem; color: var(--text-muted);"><i class="far fa-clock"></i> <?php echo date('M d, g:i A', strtotime($notif['created_at'])); ?></span>
                                         </div>
                                     </a>
@@ -350,12 +327,12 @@ $chartAmountsJSON = json_encode($chartData['amounts']);
                                     <?php foreach($messages as $msg): ?>
                                     <tr>
                                         <td>
-                                            <a href="admin_inquiry_detail.php?id=<?php echo $msg['id']; ?>" style="text-decoration: none;">
-                                                <strong style="color: var(--text-dark); display:block;"><?php echo htmlspecialchars($msg['name']); ?></strong>
-                                                <span style="font-size: 0.75rem; color: var(--text-muted);"><?php echo htmlspecialchars($msg['email']); ?></span>
+                                            <a href="admin_inquiry_detail.php?id=<?php echo $msg['id'] ?? ''; ?>" style="text-decoration: none;">
+                                                <strong style="color: var(--text-dark); display:block;"><?php echo htmlspecialchars($msg['name'] ?? ''); ?></strong>
+                                                <span style="font-size: 0.75rem; color: var(--text-muted);"><?php echo htmlspecialchars($msg['email'] ?? ''); ?></span>
                                             </a>
                                         </td>
-                                        <td style="font-size: 0.9rem;"><?php echo htmlspecialchars($msg['subject']); ?></td>
+                                        <td style="font-size: 0.9rem;"><?php echo htmlspecialchars($msg['subject'] ?? ''); ?></td>
                                         <td style="font-size: 0.85rem; color: var(--text-muted);"><?php echo date('M d, Y', strtotime($msg['created_at'])); ?></td>
                                     </tr>
                                     <?php endforeach; ?>
@@ -367,14 +344,7 @@ $chartAmountsJSON = json_encode($chartData['amounts']);
             </div>
 
         </div>
-    </main>
-</div>
-
-<!-- Dashboard Interactive Logic -->
-<script src="assets/js/dashboard.js"></script>
-
-<!-- Chart.js Initialization -->
-<script>
+    <script>
 document.addEventListener('DOMContentLoaded', function() {
     const ctx = document.getElementById('donationsChart');
     if (ctx) {
@@ -450,6 +420,4 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
-
-</body>
-</html>
+<?php require_once __DIR__ . '/includes/dashboard/layout_footer.php'; ?>

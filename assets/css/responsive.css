@@ -28,6 +28,9 @@ html, body {
 
 /* 992px - Laptops / Tablets Landscape */
 @media (max-width: 992px) {
+    .search-bar { width: 260px; min-width: 200px; }
+    .shortcut-hint { display: none; }
+
     .container { max-width: 720px; }
     
     .grid-cols-4 { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }

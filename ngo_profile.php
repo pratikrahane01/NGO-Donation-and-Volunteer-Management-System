@@ -72,29 +72,10 @@ $stmt->execute([$user_id]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Profile | <?php echo htmlspecialchars(APP_NAME); ?></title>
-    
-    <!-- Premium Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Dashboard Core CSS -->
-    <link rel="stylesheet" href="assets/css/dashboard.css">
-</head>
-<body>
-
-<div class="dashboard-layout">
-    <!-- Sidebar -->
-    <?php include __DIR__ . '/includes/dashboard/sidebar.php'; ?>
-
-    <main class="main-content">
-        <!-- Topbar -->
-        <?php include __DIR__ . '/includes/dashboard/topbar.php'; ?>
+<?php 
+$page_title = "My Profile";
+require_once __DIR__ . '/includes/dashboard/layout_header.php'; 
+?>
 
         <div class="page-content">
             <!-- Header Section -->
@@ -129,7 +110,7 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
                         <h3 class="card-title">Personal Information</h3>
                     </div>
                     <form method="POST" action="ngo_profile.php">
-                        <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+                        <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token'] ?? ''; ?>">
                         <input type="hidden" name="action" value="update_profile">
                         
                         <div class="form-group">
@@ -146,7 +127,7 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
                         </div>
                         
                         <div style="margin-top: 20px;">
-                            <button type="submit" class="btn-primary">Save Changes</button>
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
                         </div>
                     </form>
                 </div>
@@ -157,7 +138,7 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
                         <h3 class="card-title">Change Password</h3>
                     </div>
                     <form method="POST" action="ngo_profile.php">
-                        <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+                        <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token'] ?? ''; ?>">
                         <input type="hidden" name="action" value="change_password">
                         
                         <div class="form-group">
@@ -181,9 +162,5 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
             </div>
         </div>
-    </main>
-</div>
-
-<script src="assets/js/dashboard.js"></script>
-</body>
-</html>
+    
+<?php require_once __DIR__ . '/includes/dashboard/layout_footer.php'; ?>

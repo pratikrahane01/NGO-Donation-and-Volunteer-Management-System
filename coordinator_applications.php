@@ -106,25 +106,10 @@ try {
     error_log("Coordinator Applications Error: " . $e->getMessage());
 }
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Volunteer Applications | <?php echo APP_NAME; ?></title>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="assets/css/dashboard.css">
-</head>
-<body>
-
-<div class="dashboard-layout">
-    <?php include __DIR__ . '/includes/dashboard/sidebar.php'; ?>
-    <main class="main-content">
-        <?php include __DIR__ . '/includes/dashboard/topbar.php'; ?>
+<?php 
+$page_title = "Volunteer Applications";
+require_once __DIR__ . '/includes/dashboard/layout_header.php'; 
+?>
 
         <div class="page-content">
             <div class="page-header">
@@ -163,11 +148,11 @@ try {
                                 <?php foreach($applications as $app): ?>
                                 <tr>
                                     <td>
-                                        <strong style="color: var(--text-dark); display: block;"><?php echo htmlspecialchars($app['volunteer_name']); ?></strong>
-                                        <span style="font-size: 0.85rem; color: var(--text-muted);"><?php echo htmlspecialchars($app['email']); ?></span>
+                                        <strong style="color: var(--text-dark); display: block;"><?php echo htmlspecialchars($app['volunteer_name'] ?? ''); ?></strong>
+                                        <span style="font-size: 0.85rem; color: var(--text-muted);"><?php echo htmlspecialchars($app['email'] ?? ''); ?></span>
                                     </td>
                                     <td>
-                                        <span style="font-size: 0.85rem; color: var(--text-dark); font-weight: 600;"><?php echo htmlspecialchars($app['event_title']); ?></span>
+                                        <span style="font-size: 0.85rem; color: var(--text-dark); font-weight: 600;"><?php echo htmlspecialchars($app['event_title'] ?? ''); ?></span>
                                     </td>
                                     <td>
                                         <span style="font-size: 0.85rem; color: var(--text-muted);">
@@ -177,17 +162,17 @@ try {
                                     <td>
                                         <div style="display: flex; gap: 8px;">
                                             <form method="POST" action="coordinator_applications.php" onsubmit="return confirm('Are you sure you want to approve this application?');">
-                                                <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+                                                <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token'] ?? ''; ?>">
                                                 <input type="hidden" name="action" value="approve">
-                                                <input type="hidden" name="reg_id" value="<?php echo $app['reg_id']; ?>">
+                                                <input type="hidden" name="reg_id" value="<?php echo $app['reg_id'] ?? ''; ?>">
                                                 <button type="submit" class="btn-primary" style="padding: 6px 12px; font-size: 0.8rem; background: var(--success); border: none;">
                                                     <i class="fas fa-check"></i> Approve
                                                 </button>
                                             </form>
                                             <form method="POST" action="coordinator_applications.php" onsubmit="return confirm('Are you sure you want to reject this application?');">
-                                                <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+                                                <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token'] ?? ''; ?>">
                                                 <input type="hidden" name="action" value="reject">
-                                                <input type="hidden" name="reg_id" value="<?php echo $app['reg_id']; ?>">
+                                                <input type="hidden" name="reg_id" value="<?php echo $app['reg_id'] ?? ''; ?>">
                                                 <button type="submit" class="btn-primary" style="padding: 6px 12px; font-size: 0.8rem; background: var(--danger); border: none;">
                                                     <i class="fas fa-times"></i> Reject
                                                 </button>
@@ -203,10 +188,5 @@ try {
             </div>
             
         </div>
-    </main>
-</div>
-
-<script src="assets/js/dashboard.js"></script>
-
-</body>
-</html>
+    
+<?php require_once __DIR__ . '/includes/dashboard/layout_footer.php'; ?>

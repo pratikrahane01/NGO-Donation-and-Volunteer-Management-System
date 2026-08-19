@@ -12,22 +12,22 @@ $pdo = getDatabase();
 // Handle Approval Actions
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'], $_POST['id'], $_POST['type'])) {
     $id = (int)$_POST['id'];
-    $action = $_POST['action'] === 'approve' ? 'approved' : 'rejected';
+    $action = ($_POST['action'] ?? '') === 'approve' ? 'approved' : 'rejected';
     $type = $_POST['type'];
 
     try {
         if ($type === 'campaign') {
-            $status = $_POST['action'] === 'approve' ? 'active' : 'cancelled';
+            $status = ($_POST['action'] ?? '') === 'approve' ? 'active' : 'cancelled';
             $stmt = $pdo->prepare("UPDATE campaigns SET status = ? WHERE id = ?");
             $stmt->execute([$status, $id]);
         } elseif ($type === 'user') {
-            $status = $_POST['action'] === 'approve' ? 'active' : 'banned';
+            $status = ($_POST['action'] ?? '') === 'approve' ? 'active' : 'banned';
             $stmt = $pdo->prepare("UPDATE users SET status = ? WHERE id = ?");
             $stmt->execute([$status, $id]);
         }
         // Redirect to prevent form resubmission
-        header("Location: admin_approvals.php?success=1");
-        exit;
+        // (AJAX handles success)
+        
     } catch (PDOException $e) {
         $error = "Error updating status: " . $e->getMessage();
     }
@@ -50,21 +50,76 @@ usort($all_pending, function($a, $b) {
     return strtotime($b['created_at']) - strtotime($a['created_at']);
 });
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pending Approvals | <?php echo APP_NAME; ?></title>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="assets/css/dashboard.css">
-</head>
-<body>
-<div class="dashboard-layout">
-    <?php include __DIR__ . '/includes/dashboard/sidebar.php'; ?>
-    <main class="main-content">
-        <?php include __DIR__ . '/includes/dashboard/topbar.php'; ?>
+<?php 
+
+// --- AJAX MODAL HANDLER ---
+if (isset($_GET['modal']) && ($_GET['modal'] ?? '') === 'approval_review') {
+    $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+    $type = isset($_GET['type']) ? $_GET['type'] : '';
+    
+    $name = '';
+    $date = '';
+    
+    if ($type === 'campaign') {
+        $stmt = $pdo->prepare("SELECT name, created_at, description FROM campaigns WHERE id = ?");
+        $stmt->execute([$id]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        if($row) {
+            $name = $row['name'];
+            $date = $row['created_at'];
+            $desc = $row['description'];
+        }
+    } else if ($type === 'user') {
+        $stmt = $pdo->prepare("SELECT full_name as name, created_at, email as description FROM users WHERE id = ?");
+        $stmt->execute([$id]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        if($row) {
+            $name = $row['name'];
+            $date = $row['created_at'];
+            $desc = $row['description'];
+        }
+    }
+    
+    if ($name) {
+        ?>
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Review <?php echo ucfirst($type); ?></h2>
+                <button type="button" class="close-btn" data-modal-close="true"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div style="margin-bottom: 20px;">
+                    <strong style="display:block; color: var(--text-muted); font-size: 0.85rem;">Name</strong>
+                    <div style="font-weight: 600; font-size: 1.1rem;"><?php echo htmlspecialchars($name); ?></div>
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <strong style="display:block; color: var(--text-muted); font-size: 0.85rem;">Details</strong>
+                    <div style="background: rgba(0,0,0,0.02); padding: 10px; border-radius: 6px; font-size: 0.95rem;"><?php echo htmlspecialchars($desc); ?></div>
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <strong style="display:block; color: var(--text-muted); font-size: 0.85rem;">Submitted On</strong>
+                    <div><?php echo date('M d, Y h:i A', strtotime($date)); ?></div>
+                </div>
+                
+                <form method="POST" action="admin_approvals.php" class="ajax-form" style="display: flex; gap: 10px; justify-content: flex-end;">
+                    <input type="hidden" name="id" value="<?php echo $id; ?>">
+                    <input type="hidden" name="type" value="<?php echo htmlspecialchars($type); ?>">
+                    <button type="button" class="btn btn-secondary" data-modal-close="true">Cancel</button>
+                    <button type="submit" name="action" value="reject" class="btn-primary" style="background: var(--danger); border: none;"><i class="fas fa-times"></i> Reject</button>
+                    <button type="submit" name="action" value="approve" class="btn-primary" style="background: var(--success); border: none;"><i class="fas fa-check"></i> Approve</button>
+                </form>
+            </div>
+        </div>
+        <?php
+    }
+    
+}
+// --- END AJAX MODAL HANDLER ---
+
+
+$page_title = "Pending Approvals";
+require_once __DIR__ . '/includes/dashboard/layout_header.php'; 
+?>
         <div class="page-content">
             <div class="page-header">
                 <div class="page-title">
@@ -98,15 +153,10 @@ usort($all_pending, function($a, $b) {
                                 <?php foreach($all_pending as $item): ?>
                                 <tr>
                                     <td><span class="status-badge status-pending"><?php echo ucfirst($item['type']); ?></span></td>
-                                    <td><strong><?php echo htmlspecialchars($item['name']); ?></strong></td>
+                                    <td><strong><?php echo htmlspecialchars($item['name'] ?? ''); ?></strong></td>
                                     <td><?php echo date('M d, Y', strtotime($item['created_at'])); ?></td>
                                     <td>
-                                        <form method="POST" style="display: inline;">
-                                            <input type="hidden" name="id" value="<?php echo $item['id']; ?>">
-                                            <input type="hidden" name="type" value="<?php echo $item['type']; ?>">
-                                            <button type="submit" name="action" value="approve" class="btn-primary" style="padding: 5px 10px; font-size: 0.8rem; background: var(--success); border: none;"><i class="fas fa-check"></i> Approve</button>
-                                            <button type="submit" name="action" value="reject" class="btn-primary" style="padding: 5px 10px; font-size: 0.8rem; background: var(--danger); border: none;"><i class="fas fa-times"></i> Reject</button>
-                                        </form>
+                                        <button data-ajax-modal="true" data-url="admin_approvals.php?modal=approval_review&id=<?php echo $item['id'] ?? ''; ?>&type=<?php echo $item['type'] ?? ''; ?>" class="btn-primary" style="padding: 5px 15px; font-size: 0.85rem;"><i class="fas fa-search"></i> Review</button>
                                     </td>
                                 </tr>
                                 <?php endforeach; ?>
@@ -116,8 +166,5 @@ usort($all_pending, function($a, $b) {
                 <?php endif; ?>
             </div>
         </div>
-    </main>
-</div>
-<script src="assets/js/dashboard.js"></script>
-</body>
-</html>
+    
+<?php require_once __DIR__ . '/includes/dashboard/layout_footer.php'; ?>

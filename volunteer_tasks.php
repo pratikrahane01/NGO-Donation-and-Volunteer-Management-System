@@ -68,25 +68,10 @@ try {
     error_log("Volunteer Tasks Fetch Error: " . $e->getMessage());
 }
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Tasks | <?php echo APP_NAME; ?></title>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="assets/css/dashboard.css">
-</head>
-<body>
-
-<div class="dashboard-layout">
-    <?php include __DIR__ . '/includes/dashboard/sidebar.php'; ?>
-    <main class="main-content">
-        <?php include __DIR__ . '/includes/dashboard/topbar.php'; ?>
+<?php 
+$page_title = "My Tasks";
+require_once __DIR__ . '/includes/dashboard/layout_header.php'; 
+?>
 
         <div class="page-content">
             <div class="page-header">
@@ -123,13 +108,13 @@ try {
                                 <?php foreach($tasks as $task): ?>
                                 <tr>
                                     <td>
-                                        <strong style="color: var(--text-dark); display: block;"><?php echo htmlspecialchars($task['task_name']); ?></strong>
+                                        <strong style="color: var(--text-dark); display: block;"><?php echo htmlspecialchars($task['task_name'] ?? ''); ?></strong>
                                         <?php if (!empty($task['description'])): ?>
-                                            <span style="font-size: 0.85rem; color: var(--text-muted);"><?php echo htmlspecialchars($task['description']); ?></span>
+                                            <span style="font-size: 0.85rem; color: var(--text-muted);"><?php echo htmlspecialchars($task['description'] ?? ''); ?></span>
                                         <?php endif; ?>
                                     </td>
                                     <td>
-                                        <span style="font-size: 0.85rem; color: var(--text-dark); font-weight: 600;"><?php echo htmlspecialchars($task['event_title']); ?></span>
+                                        <span style="font-size: 0.85rem; color: var(--text-dark); font-weight: 600;"><?php echo htmlspecialchars($task['event_title'] ?? ''); ?></span>
                                     </td>
                                     <td>
                                         <?php 
@@ -155,14 +140,14 @@ try {
                                     <td>
                                         <?php if ($task['completion_status'] === 'pending'): ?>
                                             <form method="POST" style="display:inline;">
-                                                <input type="hidden" name="task_id" value="<?php echo $task['id']; ?>">
+                                                <input type="hidden" name="task_id" value="<?php echo $task['id'] ?? ''; ?>">
                                                 <input type="hidden" name="status" value="in_progress">
                                                 <button type="submit" class="btn-primary" style="padding: 5px 12px; font-size: 0.75rem; border: none; cursor: pointer; background: var(--warning);"><i class="fas fa-spinner"></i> Start</button>
                                             </form>
                                         <?php elseif ($task['completion_status'] === 'in_progress'): ?>
-                                            <a href="volunteer_task_submit.php?id=<?php echo $task['id']; ?>" class="btn-primary" style="padding: 5px 12px; font-size: 0.75rem; text-decoration: none; display: inline-block; background: var(--success);"><i class="fas fa-upload"></i> Submit Work</a>
+                                            <a href="volunteer_task_submit.php?id=<?php echo $task['id'] ?? ''; ?>" class="btn-primary" style="padding: 5px 12px; font-size: 0.75rem; text-decoration: none; display: inline-block; background: var(--success);"><i class="fas fa-upload"></i> Submit Work</a>
                                         <?php elseif ($task['completion_status'] === 'needs_revision'): ?>
-                                            <a href="volunteer_task_submit.php?id=<?php echo $task['id']; ?>" class="btn-primary" style="padding: 5px 12px; font-size: 0.75rem; text-decoration: none; display: inline-block; background: var(--danger);"><i class="fas fa-edit"></i> Edit Submission</a>
+                                            <a href="volunteer_task_submit.php?id=<?php echo $task['id'] ?? ''; ?>" class="btn-primary" style="padding: 5px 12px; font-size: 0.75rem; text-decoration: none; display: inline-block; background: var(--danger);"><i class="fas fa-edit"></i> Edit Submission</a>
                                         <?php elseif ($task['completion_status'] === 'submitted_for_review'): ?>
                                             <span style="color: var(--text-muted); font-size: 0.9rem;"><i class="fas fa-hourglass-half"></i> In Review</span>
                                         <?php else: ?>
@@ -178,10 +163,5 @@ try {
             </div>
 
         </div>
-    </main>
-</div>
-
-<script src="assets/js/dashboard.js"></script>
-
-</body>
-</html>
+    
+<?php require_once __DIR__ . '/includes/dashboard/layout_footer.php'; ?>

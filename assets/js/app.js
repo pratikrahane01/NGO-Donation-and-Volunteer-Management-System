@@ -227,32 +227,94 @@ const App = {
 };
 
 window.ModalEngine = {
-    open(modalId) {
+        open(modalId) {
         const modal = document.getElementById(modalId);
         if (modal) {
             modal.classList.add('active');
+            
+            // Prevent layout shift by compensating for missing scrollbar
+            const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+            if (scrollbarWidth > 0 && document.body.style.overflow !== 'hidden') {
+                document.body.style.paddingRight = `${scrollbarWidth}px`;
+                // Also pad sticky header if necessary
+                const header = document.querySelector('.header');
+                if (header) header.style.paddingRight = `calc(1.5rem + ${scrollbarWidth}px)`;
+            }
+            
+            document.body.classList.add('modal-open');
             document.body.style.overflow = 'hidden';
-            this.trapFocus(modal);
+            setTimeout(() => this.trapFocus(modal), 100);
         }
     },
     close(modalId) {
         const modal = document.getElementById(modalId);
         if (modal) {
             modal.classList.remove('active');
+            document.body.classList.remove('modal-open');
             document.body.style.overflow = '';
+                    document.body.style.paddingRight = '';
+                    const header = document.querySelector('.header');
+                    if (header) header.style.paddingRight = '';
+        }
+    },
+    async openAjax(url) {
+        const globalModal = document.getElementById('globalModal');
+        const contentContainer = document.getElementById('globalModalContent');
+        if (!globalModal || !contentContainer) return;
+        
+        // Show modal with loading state
+        contentContainer.innerHTML = '<div class="modal" style="max-width: 400px; margin: auto; padding: 40px; text-align: center;"><i class="fas fa-spinner fa-spin fa-2x" style="color: var(--primary);"></i><p style="margin-top: 15px; color: var(--text-muted);">Loading...</p></div>';
+        this.open('globalModal');
+        
+        try {
+            const response = await fetch(url);
+            if (!response.ok) throw new Error('Network response was not ok');
+            const html = await response.text();
+            
+            // Inject the fetched HTML (which should be the .modal-content div)
+            contentContainer.innerHTML = html;
+            
+            // Trap focus after rendering
+            setTimeout(() => this.trapFocus(globalModal), 100);
+        } catch (error) {
+            console.error('AJAX Modal Error:', error);
+            contentContainer.innerHTML = '<div class="modal" style="max-width: 400px; margin: auto; padding: 40px; text-align: center; color: var(--danger);"><i class="fas fa-exclamation-circle fa-2x"></i><p style="margin-top: 15px;">Failed to load content. Please try again.</p><button class="btn-secondary" style="margin-top: 15px;" data-modal-close="true">Close</button></div>';
         }
     },
     init() {
         document.addEventListener('click', (e) => {
-            if (e.target.hasAttribute('data-modal-target')) {
+            // Handle standard modal target
+            const toggle = e.target.closest('[data-modal-target]');
+            if (toggle) {
                 e.preventDefault();
-                this.open(e.target.getAttribute('data-modal-target'));
+                this.open(toggle.getAttribute('data-modal-target'));
             }
-            if (e.target.hasAttribute('data-modal-close') || e.target.classList.contains('modal-backdrop')) {
+            
+            // Handle AJAX modal target
+            const ajaxToggle = e.target.closest('[data-ajax-modal="true"]');
+            if (ajaxToggle) {
+                e.preventDefault();
+                this.openAjax(ajaxToggle.getAttribute('data-url'));
+            }
+            
+            // Handle closing
+            if (e.target.hasAttribute('data-modal-close') || e.target.classList.contains('modal-backdrop') || e.target.closest('[data-modal-close]')) {
                 const modal = e.target.closest('.modal-backdrop');
                 if (modal) {
                     modal.classList.remove('active');
-                    document.body.style.overflow = '';
+                    document.body.classList.remove('modal-open');
+            document.body.style.overflow = '';
+                    document.body.style.paddingRight = '';
+                    const header = document.querySelector('.header');
+                    if (header) header.style.paddingRight = '';
+                    
+                    // Clear global modal content to prevent flash of old content next time
+                    if (modal.id === 'globalModal') {
+                        setTimeout(() => {
+                            const content = document.getElementById('globalModalContent');
+                            if (content) content.innerHTML = '';
+                        }, 300); // Wait for transition
+                    }
                 }
             }
         });
@@ -261,13 +323,17 @@ window.ModalEngine = {
             if (e.key === 'Escape') {
                 document.querySelectorAll('.modal-backdrop.active').forEach(modal => {
                     modal.classList.remove('active');
-                    document.body.style.overflow = '';
+                    document.body.classList.remove('modal-open');
+            document.body.style.overflow = '';
+                    document.body.style.paddingRight = '';
+                    const header = document.querySelector('.header');
+                    if (header) header.style.paddingRight = '';
                 });
             }
         });
     },
     trapFocus(modal) {
-        const focusableElements = modal.querySelectorAll('a[href], button:not([disabled]), textarea, input, select');
+        const focusableElements = modal.querySelectorAll('a[href], button:not([disabled]), textarea, input:not([type="hidden"]), select');
         if(focusableElements.length) focusableElements[0].focus();
     }
 };
@@ -346,3 +412,93 @@ const Utils = {
         };
     }
 };
+
+// Global AJAX Form Interceptor for Modals (Hot Swap)
+document.addEventListener('submit', async (e) => {
+    if (e.target.classList.contains('ajax-form')) {
+        e.preventDefault();
+        const form = e.target;
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalText = submitBtn ? submitBtn.innerHTML : '';
+        
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+        }
+
+        try {
+            const formData = new FormData(form);
+            const actionUrl = form.getAttribute('action') || window.location.href;
+            
+            const response = await fetch(actionUrl, {
+                method: form.method || 'POST',
+                body: formData
+            });
+
+            if (response.ok) {
+                const pageHtml = await response.text();
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(pageHtml, 'text/html');
+
+                const newTable = doc.querySelector('.table-responsive') || doc.querySelector('.modern-table') || doc.querySelector('.grid-container');
+                const oldTable = document.querySelector('.table-responsive') || document.querySelector('.modern-table') || document.querySelector('.grid-container');
+                
+                if (newTable && oldTable) {
+                    oldTable.innerHTML = newTable.innerHTML;
+                } else {
+                    window.location.reload();
+                    return;
+                }
+
+                const newPagination = doc.querySelector('.pagination');
+                const oldPagination = document.querySelector('.pagination');
+                if (newPagination && oldPagination) {
+                    oldPagination.innerHTML = newPagination.innerHTML;
+                } else if (newPagination && !oldPagination && oldTable) {
+                    oldTable.insertAdjacentHTML('afterend', newPagination.outerHTML);
+                }
+
+                const newKpis = doc.querySelector('.kpi-grid');
+                const oldKpis = document.querySelector('.kpi-grid');
+                if(newKpis && oldKpis) {
+                    oldKpis.innerHTML = newKpis.innerHTML;
+                }
+
+                const modalWrapper = form.closest('.modal-backdrop');
+                if (modalWrapper && window.ModalEngine) {
+                    ModalEngine.close(modalWrapper.id);
+                }
+
+                if (window.ToastEngine) {
+                    ToastEngine.show({ type: 'success', title: 'Success', message: 'Action completed successfully.' });
+                }
+            } else {
+                if (window.ToastEngine) {
+                    ToastEngine.show({ type: 'error', title: 'Error', message: 'An error occurred while saving.' });
+                }
+            }
+        } catch (error) {
+            console.error('AJAX Submit Error:', error);
+            if (window.ToastEngine) {
+                ToastEngine.show({ type: 'error', title: 'Error', message: 'Network error. Please try again.' });
+            }
+        } finally {
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
+        }
+    }
+});
+
+// Global Keyboard Shortcuts
+document.addEventListener('keydown', (e) => {
+    // Focus search on '/'
+    if (e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+        const searchInput = document.getElementById('global-search-input');
+        if (searchInput) {
+            e.preventDefault();
+            searchInput.focus();
+        }
+    }
+});

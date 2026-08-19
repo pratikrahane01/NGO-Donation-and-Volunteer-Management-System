@@ -242,7 +242,7 @@ $csrfToken = Security::generateCSRF();
                         <div class="card-overlay"></div>
                     </div>
                     <div class="card-body">
-                        <h3 class="card-title"><a href="#">Provide Education for Rural Children</a></h3>
+                        <h3 class="card-title"><a href="javascript:void(0)">Provide Education for Rural Children</a></h3>
                         <p class="card-desc">Help us build a new school and provide essential learning materials for 500 children.</p>
                         
                         <div class="fund-stats">
@@ -255,7 +255,7 @@ $csrfToken = Security::generateCSRF();
                         
                         <div class="card-footer">
                             <div class="days-left"><i class="fas fa-clock"></i> 12 Days Left</div>
-                            <a href="#" class="btn-link">Donate <i class="fas fa-arrow-right"></i></a>
+                            <a href="javascript:void(0)" class="btn-link">Donate <i class="fas fa-arrow-right"></i></a>
                         </div>
                     </div>
                 </div>
@@ -268,7 +268,7 @@ $csrfToken = Security::generateCSRF();
                         <div class="card-overlay"></div>
                     </div>
                     <div class="card-body">
-                        <h3 class="card-title"><a href="#">Clean Water Initiative in Africa</a></h3>
+                        <h3 class="card-title"><a href="javascript:void(0)">Clean Water Initiative in Africa</a></h3>
                         <p class="card-desc">Building sustainable solar-powered water wells to serve isolated communities.</p>
                         
                         <div class="fund-stats">
@@ -281,7 +281,7 @@ $csrfToken = Security::generateCSRF();
                         
                         <div class="card-footer">
                             <div class="days-left"><i class="fas fa-clock"></i> 5 Days Left</div>
-                            <a href="#" class="btn-link">Donate <i class="fas fa-arrow-right"></i></a>
+                            <a href="javascript:void(0)" class="btn-link">Donate <i class="fas fa-arrow-right"></i></a>
                         </div>
                     </div>
                 </div>
@@ -294,7 +294,7 @@ $csrfToken = Security::generateCSRF();
                         <div class="card-overlay"></div>
                     </div>
                     <div class="card-body">
-                        <h3 class="card-title"><a href="#">Emergency Medical Relief Fund</a></h3>
+                        <h3 class="card-title"><a href="javascript:void(0)">Emergency Medical Relief Fund</a></h3>
                         <p class="card-desc">Providing critical medical supplies and mobile clinics in disaster-struck zones.</p>
                         
                         <div class="fund-stats">
@@ -307,7 +307,7 @@ $csrfToken = Security::generateCSRF();
                         
                         <div class="card-footer">
                             <div class="days-left"><i class="fas fa-clock"></i> 20 Days Left</div>
-                            <a href="#" class="btn-link">Donate <i class="fas fa-arrow-right"></i></a>
+                            <a href="javascript:void(0)" class="btn-link">Donate <i class="fas fa-arrow-right"></i></a>
                         </div>
                     </div>
                 </div>
@@ -483,45 +483,45 @@ $csrfToken = Security::generateCSRF();
                     </div>
                     <p class="f-desc">Building the future of transparent philanthropy. Empowering communities worldwide through direct action.</p>
                     <div class="social-icons">
-                        <a href="#"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#"><i class="fab fa-twitter"></i></a>
-                        <a href="#"><i class="fab fa-instagram"></i></a>
-                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="https://facebook.com/arohan"><i class="fab fa-facebook-f"></i></a>
+                        <a href="https://twitter.com/arohan"><i class="fab fa-twitter"></i></a>
+                        <a href="https://instagram.com/arohan"><i class="fab fa-instagram"></i></a>
+                        <a href="https://linkedin.com/company/arohan"><i class="fab fa-linkedin-in"></i></a>
                     </div>
                 </div>
                 <div class="footer-col">
                     <h4>Platform</h4>
                     <div class="f-links">
-                        <a href="#">Explore Campaigns</a>
-                        <a href="#">Upcoming Events</a>
-                        <a href="#">Transparency Ledger</a>
-                        <a href="#">Success Stories</a>
+                        <a href="javascript:void(0)">Explore Campaigns</a>
+                        <a href="javascript:void(0)">Upcoming Events</a>
+                        <a href="javascript:void(0)">Transparency Ledger</a>
+                        <a href="javascript:void(0)">Success Stories</a>
                     </div>
                 </div>
                 <div class="footer-col">
                     <h4>Company</h4>
                     <div class="f-links">
-                        <a href="#">About Us</a>
-                        <a href="#">Careers</a>
-                        <a href="#">Press & Media</a>
-                        <a href="#">Contact Support</a>
+                        <a href="javascript:void(0)">About Us</a>
+                        <a href="javascript:void(0)">Careers</a>
+                        <a href="javascript:void(0)">Press & Media</a>
+                        <a href="javascript:void(0)">Contact Support</a>
                     </div>
                 </div>
                 <div class="footer-col">
                     <h4>Legal</h4>
                     <div class="f-links">
-                        <a href="#">Privacy Policy</a>
-                        <a href="#">Terms of Service</a>
-                        <a href="#">Cookie Policy</a>
-                        <a href="#">Donor Guidelines</a>
+                        <a href="privacy.php">Privacy Policy</a>
+                        <a href="terms.php">Terms of Service</a>
+                        <a href="javascript:void(0)">Cookie Policy</a>
+                        <a href="javascript:void(0)">Donor Guidelines</a>
                     </div>
                 </div>
             </div>
             <div class="footer-bottom">
                 <p>&copy; <?php echo date('Y'); ?> Arohan Foundation Inc. All rights reserved.</p>
                 <div class="footer-bottom-links">
-                    <a href="#">Privacy</a>
-                    <a href="#">Terms</a>
+                    <a href="privacy.php">Privacy</a>
+                    <a href="terms.php">Terms</a>
                 </div>
             </div>
         </div>

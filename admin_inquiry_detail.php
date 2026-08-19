@@ -80,22 +80,10 @@ try {
 }
 $prefix = ($role_id == 2) ? 'ngo' : 'admin';
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inquiry Details | <?php echo htmlspecialchars(APP_NAME); ?></title>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="assets/css/dashboard.css">
-</head>
-<body>
-
-<div class="dashboard-layout">
-    <?php include __DIR__ . '/includes/dashboard/sidebar.php'; ?>
-    <main class="main-content">
-        <?php include __DIR__ . '/includes/dashboard/topbar.php'; ?>
+<?php 
+$page_title = "Inquiry Details";
+require_once __DIR__ . '/includes/dashboard/layout_header.php'; 
+?>
 
         <div class="page-content">
             <div class="page-header" style="margin-bottom: 20px;">
@@ -135,13 +123,13 @@ $prefix = ($role_id == 2) ? 'ngo' : 'admin';
                                 <?php echo htmlspecialchars($inquiry['first_name'] . ' ' . $inquiry['last_name']); ?>
                             </h4>
                             <p style="color: var(--text-muted); font-size: 0.9rem;">
-                                <i class="fas fa-envelope"></i> <?php echo htmlspecialchars($inquiry['email']); ?> 
+                                <i class="fas fa-envelope"></i> <?php echo htmlspecialchars($inquiry['email'] ?? ''); ?> 
                                 <span style="margin: 0 10px;">|</span> 
                                 <i class="far fa-clock"></i> <?php echo date('F j, Y, g:i A', strtotime($inquiry['submitted_at'])); ?>
                             </p>
                         </div>
                         
-                        <div style="background: rgba(0,0,0,0.02); padding: 20px; border-radius: 8px; border: 1px solid rgba(0,0,0,0.05); font-size: 0.95rem; line-height: 1.6; color: var(--text-body); white-space: pre-wrap;"><?php echo htmlspecialchars($inquiry['message']); ?></div>
+                        <div style="background: rgba(0,0,0,0.02); padding: 20px; border-radius: 8px; border: 1px solid rgba(0,0,0,0.05); font-size: 0.95rem; line-height: 1.6; color: var(--text-body); white-space: pre-wrap;"><?php echo htmlspecialchars($inquiry['message'] ?? ''); ?></div>
                     </div>
                 </div>
 
@@ -151,24 +139,24 @@ $prefix = ($role_id == 2) ? 'ngo' : 'admin';
                         <h3 class="card-title">Management</h3>
                     </div>
                     <form method="POST">
-                        <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+                        <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token'] ?? ''; ?>">
                         <input type="hidden" name="action" value="update_inquiry">
                         
                         <div class="form-group" style="margin-bottom: 15px;">
                             <label>Status</label>
                             <select name="status" class="form-control">
-                                <option value="pending" <?php echo $inquiry['status'] == 'pending' ? 'selected' : ''; ?>>Pending</option>
-                                <option value="read" <?php echo $inquiry['status'] == 'read' ? 'selected' : ''; ?>>Read</option>
-                                <option value="resolved" <?php echo $inquiry['status'] == 'resolved' ? 'selected' : ''; ?>>Resolved</option>
+                                <option value="pending" <?php echo ($inquiry['status'] ?? '') == 'pending' ? 'selected' : ''; ?>>Pending</option>
+                                <option value="read" <?php echo ($inquiry['status'] ?? '') == 'read' ? 'selected' : ''; ?>>Read</option>
+                                <option value="resolved" <?php echo ($inquiry['status'] ?? '') == 'resolved' ? 'selected' : ''; ?>>Resolved</option>
                             </select>
                         </div>
 
                         <div class="form-group" style="margin-bottom: 15px;">
                             <label>Priority</label>
                             <select name="priority" class="form-control">
-                                <option value="low" <?php echo $inquiry['priority'] == 'low' ? 'selected' : ''; ?>>Low</option>
-                                <option value="medium" <?php echo $inquiry['priority'] == 'medium' ? 'selected' : ''; ?>>Medium</option>
-                                <option value="high" <?php echo $inquiry['priority'] == 'high' ? 'selected' : ''; ?>>High</option>
+                                <option value="low" <?php echo ($inquiry['priority'] ?? '') == 'low' ? 'selected' : ''; ?>>Low</option>
+                                <option value="medium" <?php echo ($inquiry['priority'] ?? '') == 'medium' ? 'selected' : ''; ?>>Medium</option>
+                                <option value="high" <?php echo ($inquiry['priority'] ?? '') == 'high' ? 'selected' : ''; ?>>High</option>
                             </select>
                         </div>
 
@@ -177,15 +165,11 @@ $prefix = ($role_id == 2) ? 'ngo' : 'admin';
                             <textarea name="internal_notes" class="form-control" rows="4" placeholder="Add notes for internal team..."><?php echo htmlspecialchars($inquiry['internal_notes'] ?? ''); ?></textarea>
                         </div>
                         
-                        <button type="submit" class="btn-primary w-100">Update Inquiry</button>
+                        <button type="submit" class="btn btn-primary">Update Inquiry</button>
                     </form>
                 </div>
             </div>
 
         </div>
-    </main>
-</div>
-
-<script src="assets/js/dashboard.js"></script>
-</body>
-</html>
+    
+<?php require_once __DIR__ . '/includes/dashboard/layout_footer.php'; ?>

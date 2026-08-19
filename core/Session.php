@@ -61,7 +61,7 @@ class Session {
             if ($data) {
                 $userModel = new User();
                 $user = $userModel->findById($data['user_id']);
-                if ($user && hash_equals($user['password'], $data['password_hash']) && $user['status'] === 'active') {
+                if ($user && hash_equals($user['password'], $data['password_hash']) && ($user['status'] ?? '') === 'active') {
                     self::login($user, false); // Log them in, don't recreate cookie
                     return true;
                 }

@@ -14,21 +14,10 @@ try {
     $messages = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {}
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact Messages | <?php echo APP_NAME; ?></title>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="assets/css/dashboard.css">
-</head>
-<body>
-<div class="dashboard-layout">
-    <?php include __DIR__ . '/includes/dashboard/sidebar.php'; ?>
-    <main class="main-content">
-        <?php include __DIR__ . '/includes/dashboard/topbar.php'; ?>
+<?php 
+$page_title = "Contact Messages";
+require_once __DIR__ . '/includes/dashboard/layout_header.php'; 
+?>
         <div class="page-content">
             <div class="page-header">
                 <div class="page-title">
@@ -54,11 +43,11 @@ try {
                             <tbody>
                                 <?php foreach($messages as $msg): ?>
                                 <tr>
-                                    <td><strong><?php echo htmlspecialchars($msg['name']); ?></strong></td>
-                                    <td><?php echo htmlspecialchars($msg['email']); ?></td>
-                                    <td><?php echo htmlspecialchars($msg['subject']); ?></td>
+                                    <td><strong><?php echo htmlspecialchars($msg['name'] ?? ''); ?></strong></td>
+                                    <td><?php echo htmlspecialchars($msg['email'] ?? ''); ?></td>
+                                    <td><?php echo htmlspecialchars($msg['subject'] ?? ''); ?></td>
                                     <td><?php echo date('M d, Y', strtotime($msg['created_at'])); ?></td>
-                                    <td><span class="status-badge <?php echo $msg['status'] === 'new' ? 'status-pending' : 'status-active'; ?>"><?php echo ucfirst($msg['status']); ?></span></td>
+                                    <td><span class="status-badge <?php echo ($msg['status'] ?? '') === 'new' ? 'status-pending' : 'status-active'; ?>"><?php echo ucfirst($msg['status']); ?></span></td>
                                 </tr>
                                 <?php endforeach; ?>
                             </tbody>
@@ -67,8 +56,5 @@ try {
                 <?php endif; ?>
             </div>
         </div>
-    </main>
-</div>
-<script src="assets/js/dashboard.js"></script>
-</body>
-</html>
+    
+<?php require_once __DIR__ . '/includes/dashboard/layout_footer.php'; ?>

@@ -1,0 +1,350 @@
+
+Notice: session_start(): Ignoring session_start() because a session is already active in C:\xampp\htdocs\NGO-donation-management-system\coordinator_tasks.php on line 3
+
+Warning: Undefined array key "REQUEST_METHOD" in C:\xampp\htdocs\NGO-donation-management-system\coordinator_tasks.php on line 48
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Management | Arohan Foundation</title>
+    
+    <!-- Premium Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Dashboard Core CSS -->
+    <link rel="stylesheet" href="assets/css/dashboard.css">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Toastr CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+</head>
+<body>
+
+<div class="dashboard-layout">
+    
+    <!-- Premium Sidebar -->
+    <!-- Mobile Overlay -->
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <a href="index.php" class="sidebar-logo">
+            <img src="assets/images/logo/arohan-logo.jpeg" alt="Arohan Logo">
+            <span>Arohan Foundation</span>
+        </a>
+    </div>
+
+    <div class="sidebar-menu">
+                    <div class="menu-group">
+                <div class="menu-label">Event Coordinator</div>
+                <a href="coordinator_dashboard.php" class="menu-item ">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="coordinator_events.php" class="menu-item ">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>My Events</span>
+                </a>
+                <a href="coordinator_applications.php" class="menu-item ">
+                    <i class="fas fa-envelope-open-text"></i>
+                    <span>Applications</span>
+                </a>
+                <a href="coordinator_volunteers.php" class="menu-item ">
+                    <i class="fas fa-hands-helping"></i>
+                    <span>Volunteers</span>
+                </a>
+                <a href="coordinator_tasks.php" class="menu-item ">
+                    <i class="fas fa-tasks"></i>
+                    <span>Tasks</span>
+                </a>
+                <a href="coordinator_task_submissions.php" class="menu-item ">
+                    <i class="fas fa-file-signature"></i>
+                    <span>Task Submissions</span>
+                </a>
+                <a href="coordinator_attendance.php" class="menu-item ">
+                    <i class="fas fa-clipboard-check"></i>
+                    <span>Attendance</span>
+                </a>
+                <a href="coordinator_notifications.php" class="menu-item ">
+                    <i class="fas fa-bell"></i>
+                    <span>Notifications</span>
+                </a>
+                <a href="coordinator_profile.php" class="menu-item ">
+                    <i class="fas fa-user-circle"></i>
+                    <span>My Profile</span>
+                </a>
+            </div>
+        
+        <div class="menu-group" style="margin-top: auto; padding-top: 20px;">
+            <a href="logout.php" class="menu-item" style="color: var(--danger);">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+    </div>
+</aside>
+
+    <main class="main-content">
+        <!-- Sticky Topbar -->
+        <header class="topbar">
+    <div class="topbar-left">
+        <button class="toggle-sidebar" id="toggle-sidebar">
+            <i class="fas fa-bars"></i>
+        </button>
+        
+        <form action="admin_search.php" method="GET" class="search-bar" style="margin: 0; padding: 0; border: none; background: transparent;">
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" name="q" placeholder="Search campaigns, donors...">
+            </div>
+        </form>
+    </div>
+    
+    <div class="topbar-right">
+        <div class="action-btn" style="position: relative;" data-toggle="dropdown" data-target="notification-dropdown">
+            <i class="fas fa-bell"></i>
+                                    <span class="badge">0</span>
+            
+            <div class="dropdown-menu" id="notification-dropdown" style="right: -10px; width: 300px;">
+                <div class="dropdown-header" style="display: flex; justify-content: space-between; align-items: center;">
+                    <span>Notifications</span>
+                    <a href="coordinator_notifications.php?action=mark_all_read" style="font-size: 0.75rem; color: var(--primary); text-decoration: none;">Mark all read</a>
+                </div>
+                                    <div style="padding: 15px; text-align: center; color: var(--text-muted); font-size: 0.85rem;">No new notifications</div>
+                                <div style="padding: 10px; text-align: center; border-top: 1px solid rgba(0,0,0,0.05);">
+                    <a href="coordinator_notifications.php" style="font-size: 0.8rem; font-weight: 600; color: var(--primary); text-decoration: none;">View All</a>
+                </div>
+            </div>
+        </div>
+        
+                
+        <div class="action-btn user-avatar" style="border: none; background: var(--primary); color: white;" data-toggle="dropdown" data-target="user-dropdown-topbar">
+            T            <div class="dropdown-menu" id="user-dropdown-topbar" style="top: calc(100% + 15px);">
+                <div class="dropdown-header">
+                    <div style="font-weight: 700; color: var(--text-dark);">Test Coord</div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 400;">test@test.com</div>
+                </div>
+                                    <a href="coordinator_profile.php" class="dropdown-item"><i class="fas fa-user-circle"></i> My Profile</a>
+                                <a href="javascript:void(0)" class="dropdown-item"><i class="fas fa-cog"></i> Preferences</a>
+                <div style="height: 1px; background: rgba(0,0,0,0.05); margin: 5px 0;"></div>
+                <a href="logout.php" class="dropdown-item" style="color: var(--danger);"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
+        </div>
+    </div>
+</header>
+
+        <div class="page-content">
+            <!-- Header Section -->
+            <div class="page-header">
+                <div class="page-title">
+                    <h1>Task Management</h1>
+                    <div class="breadcrumb">
+                        <span>Dashboard</span>
+                        <span style="margin: 0 8px;">/</span>
+                        <span style="color: var(--primary);">Tasks</span>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <button class="btn-primary" onclick="openCreateModal()">
+                        <i class="fas fa-plus"></i> Assign Task
+                    </button>
+                </div>
+            </div>
+
+            <!-- Alerts -->
+                        
+            <!-- Filter Bar -->
+            <div class="glass-card" style="margin-bottom: 20px;">
+                <form method="GET" action="coordinator_tasks.php" class="filter-bar">
+                    <input type="text" name="search" placeholder="Search task or volunteer..." value="">
+                    
+                    <select name="event_id">
+                        <option value="">All Events</option>
+                                            </select>
+
+                    <select name="status">
+                        <option value="">All Statuses</option>
+                        <option value="pending" >Pending</option>
+                        <option value="in_progress" >In Progress</option>
+                        <option value="completed" >Completed</option>
+                    </select>
+
+                    <select name="priority">
+                        <option value="">All Priorities</option>
+                        <option value="high" >High</option>
+                        <option value="medium" >Medium</option>
+                        <option value="low" >Low</option>
+                    </select>
+
+                    <button type="submit" class="btn-primary" style="padding: 10px 20px;"><i class="fas fa-filter"></i> Filter</button>
+                    <a href="coordinator_tasks.php" class="btn-primary" style="padding: 10px 20px; background: rgba(0,0,0,0.05); color: var(--text-dark); text-decoration: none;"><i class="fas fa-undo"></i> Reset</a>
+                </form>
+            </div>
+
+            <!-- Tasks Table -->
+            <div class="glass-card">
+                                    
+    <div class='glass-card empty-state'>
+        <div class='empty-icon'><i class='fas fa-tasks'></i></div>
+        <h3>No Tasks Found</h3>
+        <p>No tasks match your search criteria.</p>
+    </div>                            </div>
+        </div>
+        
+    <!-- Create Task Modal -->
+    <div id="createModal" class="modal-backdrop">
+    <div class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2>Assign New Task</h2>
+                <button class="close-btn" data-modal-close="true"><i class="fas fa-times"></i></button>
+            </div>
+            <form method="POST" action="coordinator_tasks.php" class="ajax-form">
+                <input type="hidden" name="csrf_token" value="dummy">
+                <input type="hidden" name="action" value="create_task">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Select Volunteer & Event *</label>
+                        <select name="volunteer_event" required>
+                            <option value="">-- Select --</option>
+                                                    </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Task Name *</label>
+                        <input type="text" name="task_name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea name="description" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Priority *</label>
+                        <select name="priority" required>
+                            <option value="medium">Medium</option>
+                            <option value="high">High</option>
+                            <option value="low">Low</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Deadline (Optional)</label>
+                        <input type="datetime-local" name="deadline">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" data-modal-close="true">Cancel</button>
+                    <button type="submit" class="btn-primary">Assign Task</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+    <!-- Edit Task Modal -->
+    <div id="editModal" class="modal-backdrop">
+    <div class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2>Edit Task</h2>
+                <button class="close-btn" data-modal-close="true"><i class="fas fa-times"></i></button>
+            </div>
+            <form method="POST" action="coordinator_tasks.php" class="ajax-form">
+                <input type="hidden" name="csrf_token" value="dummy">
+                <input type="hidden" name="action" value="update_task">
+                <input type="hidden" name="task_id" id="edit_task_id">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Task Name *</label>
+                        <input type="text" name="task_name" id="edit_task_name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea name="description" id="edit_description" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Status *</label>
+                        <select name="completion_status" id="edit_status" required>
+                            <option value="pending">Pending</option>
+                            <option value="in_progress">In Progress</option>
+                            <option value="needs_revision">Needs Revision</option>
+                            <option value="completed">Completed</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Priority *</label>
+                        <select name="priority" id="edit_priority" required>
+                            <option value="high">High</option>
+                            <option value="medium">Medium</option>
+                            <option value="low">Low</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Deadline</label>
+                        <input type="datetime-local" name="deadline" id="edit_deadline">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" data-modal-close="true">Cancel</button>
+                    <button type="submit" class="btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+    
+    <script>
+    function formatDT(mysqlDT) {
+        if (!mysqlDT) return '';
+        return mysqlDT.replace(' ', 'T').substring(0, 16);
+    }
+
+    function openCreateModal(eventData = null) {
+        ModalEngine.open('createModal');
+    }
+    
+    
+
+    function openEditModal(task = null) {
+        document.getElementById('edit_task_id').value = task.id;
+        document.getElementById('edit_task_name').value = task.task_name;
+        document.getElementById('edit_description').value = task.description;
+        document.getElementById('edit_status').value = task.completion_status;
+        document.getElementById('edit_priority').value = task.priority;
+        document.getElementById('edit_deadline').value = formatDT(task.deadline);
+        
+        ModalEngine.open('editModal');
+    }
+    
+    
+</script>
+        <!-- Shared Footer Component -->
+        <footer class="dashboard-footer" style="margin-top: auto; padding: 20px; text-align: center; border-top: 1px solid rgba(0,0,0,0.05); color: var(--text-muted); font-size: 0.85rem; background: transparent;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                <div>
+                    <strong>Arohan Foundation</strong> &copy; 2026. All Rights Reserved.
+                </div>
+                <div>
+                    <a href="mailto:contact@arohan.org" style="color: inherit; text-decoration: none; margin-right: 15px;"><i class="fas fa-envelope"></i> contact@arohan.org</a>
+                    <a href="http://localhost/NGO-donation-management-system" style="color: inherit; text-decoration: none; margin-right: 15px;"><i class="fas fa-globe"></i> www.arohan.org</a>
+                    <span>v1.0.0</span>
+                </div>
+            </div>
+        </footer>
+    </main>
+</div>
+
+<!-- Dashboard Interactive Logic -->
+<script src="assets/js/dashboard.js"></script>
+
+<!-- Toastr JS for global notifications -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+<!-- Alert Display Script (Reads PHP session alerts) -->
+
+
+</body>
+</html>

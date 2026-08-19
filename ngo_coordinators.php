@@ -118,142 +118,171 @@ try {
 }
 
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Coordinator Management | <?php echo htmlspecialchars(APP_NAME); ?></title>
-    
-    <!-- Premium Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Dashboard Core CSS -->
-    <link rel="stylesheet" href="assets/css/dashboard.css">
-    
-    <style>
-        .filter-bar {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-        .filter-bar input {
-            padding: 10px 15px;
-            border: 1px solid rgba(0,0,0,0.1);
-            border-radius: 8px;
-            font-family: var(--font-body);
-            background: white;
-            min-width: 250px;
-        }
-        .filter-bar input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(124, 154, 134, 0.2);
-        }
-        .pagination {
-            display: flex;
-            justify-content: center;
-            gap: 5px;
-            margin-top: 20px;
-        }
-        .page-btn {
-            padding: 8px 12px;
-            border-radius: 6px;
-            border: 1px solid rgba(0,0,0,0.1);
-            background: white;
-            color: var(--text-dark);
-            text-decoration: none;
-            transition: all 0.2s;
-        }
-        .page-btn.active {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-        }
-        
-        /* Modal Styles */
-        .modal {
-            position: fixed;
-            inset: 0;
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(6px);
-            z-index: 1050;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
-        }
-        .modal.active {
-            opacity: 1;
-            visibility: visible;
-        }
-        .modal-content {
-            background: white;
-            padding: 25px;
-            border-radius: 16px;
-            width: 100%;
-            max-width: 500px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            transform: scale(0.95);
-            transition: all 0.3s ease;
-        }
-        .modal.active .modal-content {
-            transform: scale(1);
-        }
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-        }
-        .modal-header h3 {
-            margin: 0;
-            font-size: 1.2rem;
-            color: var(--text-dark);
-        }
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 1.2rem;
-            color: var(--text-muted);
-            cursor: pointer;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            color: var(--text-dark);
-        }
-        .form-group input {
-            width: 100%;
-            padding: 10px 15px;
-            border: 1px solid rgba(0,0,0,0.1);
-            border-radius: 8px;
-            background: white;
-            font-family: var(--font-body);
-        }
-    </style>
-</head>
-<body>
+<?php 
 
-<div class="dashboard-layout">
-    <!-- Sidebar -->
-    <?php include __DIR__ . '/includes/dashboard/sidebar.php'; ?>
+// --- AJAX MODAL HANDLER ---
+if (isset($_GET['modal']) && ($_GET['modal'] ?? '') === 'edit_user') {
+    $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+    
+    $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
+    $stmt->execute([$id]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    if ($user) {
+        $rolesStmt = $pdo->query("SELECT * FROM roles ORDER BY id ASC");
+        $roles = $rolesStmt->fetchAll(PDO::FETCH_ASSOC);
+        ?>
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Edit User Details</h2>
+                <button type="button" class="close-btn" data-modal-close="true"><i class="fas fa-times"></i></button>
+            </div>
+            
+            <form method="POST" action="<?php echo basename(__FILE__); ?>" class="ajax-form">
+                <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token'] ?? ''; ?>">
+                <input type="hidden" name="action" value="update_user">
+                <input type="hidden" name="user_id" value="<?php echo $user['id'] ?? ''; ?>">
+                
+                <div class="modal-body">
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label style="display:block; margin-bottom:5px; color:var(--text-dark); font-weight:600;">User Name</label>
+                        <input type="text" class="form-control" value="<?php echo htmlspecialchars($user['full_name'] ?? ''); ?>" disabled style="width: 100%; padding: 10px; border: 1px solid rgba(0,0,0,0.1); border-radius: 6px; background: rgba(0,0,0,0.02);">
+                    </div>
+                    
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label style="display:block; margin-bottom:5px; color:var(--text-dark); font-weight:600;">Role</label>
+                        <select name="role_id" class="form-control" style="width: 100%; padding: 10px; border: 1px solid rgba(0,0,0,0.1); border-radius: 6px;" <?php echo ($_SESSION['user_id'] ?? '') == $user['id'] ? 'disabled' : ''; ?>>
+                            <?php foreach($roles as $r): ?>
+                                <option value="<?php echo $r['id'] ?? ''; ?>" <?php echo ($user['role_id'] ?? '') == $r['id'] ? 'selected' : ''; ?>>
+                                    <?php echo htmlspecialchars($r['name'] ?? ''); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <?php if($_SESSION['user_id'] == $user['id']): ?>
+                            <input type="hidden" name="role_id" value="<?php echo $user['role_id'] ?? ''; ?>">
+                        <?php endif; ?>
+                    </div>
+                    
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label style="display:block; margin-bottom:5px; color:var(--text-dark); font-weight:600;">Status</label>
+                        <select name="status" class="form-control" style="width: 100%; padding: 10px; border: 1px solid rgba(0,0,0,0.1); border-radius: 6px;" <?php echo ($_SESSION['user_id'] ?? '') == $user['id'] ? 'disabled' : ''; ?>>
+                            <option value="active" <?php echo ($user['status'] ?? '') == 'active' ? 'selected' : ''; ?>>Active</option>
+                            <option value="inactive" <?php echo ($user['status'] ?? '') == 'inactive' ? 'selected' : ''; ?>>Inactive</option>
+                            <option value="suspended" <?php echo ($user['status'] ?? '') == 'suspended' ? 'selected' : ''; ?>>Suspended</option>
+                            <option value="banned" <?php echo ($user['status'] ?? '') == 'banned' ? 'selected' : ''; ?>>Banned</option>
+                        </select>
+                        <?php if($_SESSION['user_id'] == $user['id']): ?>
+                            <input type="hidden" name="status" value="<?php echo $user['status'] ?? ''; ?>">
+                        <?php endif; ?>
+                    </div>
+                </div>
+                
+                <div class="modal-footer" style="padding-top: 15px; display: flex; justify-content: flex-end; gap: 10px;">
+                    <button type="button" class="btn btn-secondary" data-modal-close="true">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+        <?php
+    }
+    exit;
+}
+// --- END AJAX MODAL HANDLER ---
 
-    <main class="main-content">
-        <!-- Topbar -->
-        <?php include __DIR__ . '/includes/dashboard/topbar.php'; ?>
+
+if (isset($_GET['modal']) && ($_GET['modal'] ?? '') === 'create_coordinator') {
+    ?>
+    <div class="modal">
+        <div class="modal-header">
+            <h2>Add Event Coordinator</h2>
+            <button type="button" class="close-btn" data-modal-close="true"><i class="fas fa-times"></i></button>
+        </div>
+        <form method="POST" action="ngo_coordinators.php" class="ajax-form">
+            <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token'] ?? ''; ?>">
+            <input type="hidden" name="action" value="create_coordinator">
+            
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Full Name *</label>
+                    <input class="form-control" type="text" name="full_name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Email Address *</label>
+                    <input class="form-control" type="email" name="email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input class="form-control" type="text" name="phone">
+                </div>
+                
+                <div class="form-group">
+                    <label>Temporary Password *</label>
+                    <input class="form-control" type="password" name="password" required>
+                    <small style="color: var(--text-muted); display: block; margin-top: 5px;">They can change this after logging in.</small>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-modal-close="true">Cancel</button>
+                <button type="submit" class="btn-primary">Add Coordinator</button>
+            </div>
+        </form>
+    </div>
+    <?php
+    exit;
+}
+
+
+if (isset($_GET['modal']) && ($_GET['modal'] ?? '') === 'create_coordinator') {
+    ?>
+    <div class="modal">
+        <div class="modal-header">
+            <h2>Add Event Coordinator</h2>
+            <button type="button" class="close-btn" data-modal-close="true"><i class="fas fa-times"></i></button>
+        </div>
+        <form method="POST" action="ngo_coordinators.php" class="ajax-form">
+            <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token'] ?? ''; ?>">
+            <input type="hidden" name="action" value="create_coordinator">
+            
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Full Name *</label>
+                    <input class="form-control" type="text" name="full_name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Email Address *</label>
+                    <input class="form-control" type="email" name="email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input class="form-control" type="text" name="phone">
+                </div>
+                
+                <div class="form-group">
+                    <label>Temporary Password *</label>
+                    <input class="form-control" type="password" name="password" required>
+                    <small style="color: var(--text-muted); display: block; margin-top: 5px;">They can change this after logging in.</small>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-modal-close="true">Cancel</button>
+                <button type="submit" class="btn-primary">Add Coordinator</button>
+            </div>
+        </form>
+    </div>
+    <?php
+    exit;
+}
+
+
+$page_title = "Coordinator Management";
+require_once __DIR__ . '/includes/dashboard/layout_header.php'; 
+?>
 
         <div class="page-content">
             <!-- Header Section -->
@@ -267,7 +296,7 @@ try {
                     </div>
                 </div>
                 <div class="header-actions">
-                    <button class="btn-primary" onclick="openCoordModal()"><i class="fas fa-plus"></i> Add Coordinator</button>
+                    <button data-ajax-modal="true" data-url="ngo_coordinators.php?modal=create_coordinator" class="btn-primary"><i class="fas fa-plus"></i> Add Coordinator</button>
                 </div>
             </div>
 
@@ -286,7 +315,7 @@ try {
             <!-- Filter Bar -->
             <div class="glass-card" style="margin-bottom: 20px;">
                 <form method="GET" action="ngo_coordinators.php" class="filter-bar">
-                    <input type="text" name="search" placeholder="Search by name or email..." value="<?php echo htmlspecialchars($search); ?>">
+                    <input class="form-control" type="text" name="search" placeholder="Search by name or email..." value="<?php echo htmlspecialchars($search); ?>">
                     <button type="submit" class="btn-primary" style="padding: 10px 20px;"><i class="fas fa-search"></i> Search</button>
                     <a href="ngo_coordinators.php" class="btn-primary" style="padding: 10px 20px; background: rgba(0,0,0,0.05); color: var(--text-dark); text-decoration: none;"><i class="fas fa-undo"></i> Reset</a>
                 </form>
@@ -312,11 +341,11 @@ try {
                                 <?php foreach($coordinators as $coord): ?>
                                 <tr>
                                     <td>
-                                        <div style="font-weight: 600; color: var(--text-dark);"><?php echo htmlspecialchars($coord['full_name']); ?></div>
+                                        <div style="font-weight: 600; color: var(--text-dark);"><?php echo htmlspecialchars($coord['full_name'] ?? ''); ?></div>
                                         <div style="font-size: 0.8rem; color: var(--text-muted);">Joined <?php echo date('M Y', strtotime($coord['created_at'])); ?></div>
                                     </td>
                                     <td>
-                                        <div style="color: var(--text-dark);"><i class="fas fa-envelope" style="width:16px; color:var(--text-muted);"></i> <?php echo htmlspecialchars($coord['email']); ?></div>
+                                        <div style="color: var(--text-dark);"><i class="fas fa-envelope" style="width:16px; color:var(--text-muted);"></i> <?php echo htmlspecialchars($coord['email'] ?? ''); ?></div>
                                         <div style="font-size: 0.85rem; color: var(--text-muted);"><i class="fas fa-phone" style="width:16px;"></i> <?php echo htmlspecialchars($coord['phone'] ?: 'N/A'); ?></div>
                                     </td>
                                     <td>
@@ -327,14 +356,14 @@ try {
                                         <?php endif; ?>
                                     </td>
                                     <td>
-                                        <span style="font-weight: 700; color: var(--primary);"><?php echo $coord['assigned_events']; ?></span>
+                                        <span style="font-weight: 700; color: var(--primary);"><?php echo $coord['assigned_events'] ?? ''; ?></span>
                                     </td>
                                     <td>
                                         <div style="display: flex; gap: 8px;">
                                             <form method="POST" action="ngo_coordinators.php" onsubmit="return confirm('Delete this coordinator?');" style="display: inline;">
-                                                <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+                                                <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token'] ?? ''; ?>">
                                                 <input type="hidden" name="action" value="delete_coordinator">
-                                                <input type="hidden" name="id" value="<?php echo $coord['id']; ?>">
+                                                <input type="hidden" name="id" value="<?php echo $coord['id'] ?? ''; ?>">
                                                 <button type="submit" class="action-btn" style="color: var(--danger);" title="Delete">
                                                     <i class="fas fa-trash"></i>
                                                 </button>
@@ -361,57 +390,6 @@ try {
             </div>
             
         </div>
-    </main>
-</div>
 
-<!-- Modal -->
-<div class="modal" id="coordModal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3>Add Coordinator</h3>
-            <button class="modal-close" onclick="closeCoordModal()"><i class="fas fa-times"></i></button>
-        </div>
-        <form method="POST" action="ngo_coordinators.php">
-            <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
-            <input type="hidden" name="action" value="create_coordinator">
-            
-            <div class="form-group">
-                <label>Full Name *</label>
-                <input type="text" name="full_name" required placeholder="John Doe">
-            </div>
-            
-            <div class="form-group">
-                <label>Email Address *</label>
-                <input type="email" name="email" required placeholder="john@example.com">
-            </div>
-            
-            <div class="form-group">
-                <label>Phone Number</label>
-                <input type="text" name="phone" placeholder="+1234567890">
-            </div>
-            
-            <div class="form-group">
-                <label>Password *</label>
-                <input type="password" name="password" required placeholder="Set a secure password">
-            </div>
-            
-            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
-                <button type="button" class="btn-primary" style="background: rgba(0,0,0,0.05); color: var(--text-dark);" onclick="closeCoordModal()">Cancel</button>
-                <button type="submit" class="btn-primary">Create Account</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<script src="assets/js/dashboard.js"></script>
-<script>
-    function openCoordModal() {
-        document.getElementById('coordModal').classList.add('active');
-    }
     
-    function closeCoordModal() {
-        document.getElementById('coordModal').classList.remove('active');
-    }
-</script>
-</body>
-</html>
+<?php require_once __DIR__ . '/includes/dashboard/layout_footer.php'; ?>

@@ -9,7 +9,7 @@
 /* ==========================================================================
    MODERN DATA TABLE CONTAINER
    ========================================================================== */
-.table-wrapper { width: 100%; overflow-x: auto; border-radius: var(--radius-lg); border: 1px solid var(--border); background: var(--surface); box-shadow: var(--shadow-sm); position: relative; }
+.table-wrapper { width: 100%; overflow-x: auto; border-radius: var(--radius-xl); border: 1px solid var(--border-light); background: var(--surface); box-shadow: var(--shadow-sm); position: relative; }
 
 /* ==========================================================================
    TABLE STRUCTURE
@@ -18,15 +18,15 @@
 .table th, .table td { padding: 1rem 1.5rem; vertical-align: middle; }
 
 /* Sticky Header */
-.table th { background-color: var(--surface-hover); color: var(--text-secondary); font-size: var(--caption-size); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 10; white-space: nowrap; }
-.table th:first-child { border-top-left-radius: var(--radius-lg); }
-.table th:last-child { border-top-right-radius: var(--radius-lg); }
+.table th { background-color: var(--surface-hover); color: var(--text-secondary); font-size: var(--caption-size); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--border-light); position: sticky; top: 0; z-index: 10; white-space: nowrap; }
+.table th:first-child { border-top-left-radius: var(--radius-xl); }
+.table th:last-child { border-top-right-radius: var(--radius-xl); }
 
 /* Rows */
 .table td { border-bottom: 1px solid var(--border-light); color: var(--text-primary); font-size: var(--small-size); }
 .table tbody tr:last-child td { border-bottom: none; }
-.table tbody tr:last-child td:first-child { border-bottom-left-radius: var(--radius-lg); }
-.table tbody tr:last-child td:last-child { border-bottom-right-radius: var(--radius-lg); }
+.table tbody tr:last-child td:first-child { border-bottom-left-radius: var(--radius-xl); }
+.table tbody tr:last-child td:last-child { border-bottom-right-radius: var(--radius-xl); }
 
 /* Hover Row */
 .table-hover tbody tr { transition: background-color var(--transition-fast); cursor: default; }
@@ -62,7 +62,7 @@
 /* ==========================================================================
    TOOLBAR (Search & Filter)
    ========================================================================== */
-.table-toolbar { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border); background: var(--surface); border-top-left-radius: var(--radius-lg); border-top-right-radius: var(--radius-lg); flex-wrap: wrap; gap: 1rem; }
+.table-toolbar { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border-light); background: var(--surface); border-top-left-radius: var(--radius-xl); border-top-right-radius: var(--radius-xl); flex-wrap: wrap; gap: 1rem; }
 .table-toolbar .toolbar-title { font-size: var(--h5-size); font-weight: 600; color: var(--text-primary); margin: 0; }
 .table-toolbar .toolbar-actions { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
 .table-toolbar .search-box { min-width: 250px; position: relative; }
@@ -75,7 +75,7 @@
 /* ==========================================================================
    PAGINATION
    ========================================================================== */
-.table-pagination { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.5rem; border-top: 1px solid var(--border); background: var(--surface); border-bottom-left-radius: var(--radius-lg); border-bottom-right-radius: var(--radius-lg); flex-wrap: wrap; gap: 1rem; }
+.table-pagination { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.5rem; border-top: 1px solid var(--border-light); background: var(--surface); border-bottom-left-radius: var(--radius-xl); border-bottom-right-radius: var(--radius-xl); flex-wrap: wrap; gap: 1rem; }
 .table-pagination .pagination-info { font-size: var(--small-size); color: var(--text-secondary); }
 .table-pagination .pagination-controls { display: flex; gap: 0.25rem; align-items: center; }
 .table-pagination .page-btn { padding: 0.4rem 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--surface); color: var(--text-primary); cursor: pointer; transition: all var(--transition-fast); font-size: var(--small-size); font-weight: 500; }

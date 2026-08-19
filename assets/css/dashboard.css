@@ -6,52 +6,26 @@
    1. CSS Variables & Theming
 ---------------------------------------------------------------------- */
 :root {
-    /* Color Palette */
-    --primary: #7C9A86;
-    --primary-light: #A5BAAD;
-    --primary-dark: #5B7A66;
-    --accent: #E6B566;
-    --accent-light: #F2D599;
-    --accent-dark: #C99645;
-    
-    /* Backgrounds */
-    --bg-main: #FDFBF7;
-    --bg-card: rgba(255, 255, 255, 0.85);
-    --bg-card-hover: rgba(255, 255, 255, 0.95);
-    --bg-glass: rgba(255, 255, 255, 0.6);
-    
-    /* Typography Colors */
-    --text-dark: #1F2937;
-    --text-body: #4B5563;
-    --text-muted: #9CA3AF;
-    --text-light: #F3F4F6;
-    
-    /* System Colors */
-    --success: #10B981;
-    --warning: #F59E0B;
-    --danger: #EF4444;
-    --info: #3B82F6;
-    
-    /* Dimensions */
+    /* Dimensions (Layout specific, not conflicting with global.css) */
     --sidebar-width: 260px;
     --sidebar-collapsed-width: 80px;
-    --topbar-height: 70px;
+    --topbar-height: 80px;
     
-    /* Shadows */
-    --shadow-sm: 0 2px 8px rgba(0,0,0,0.03);
-    --shadow-md: 0 4px 15px rgba(0,0,0,0.05);
-    --shadow-lg: 0 10px 30px rgba(0,0,0,0.08);
-    --shadow-glow: 0 10px 30px rgba(124, 154, 134, 0.15);
+    /* Backgrounds specific to dashboard */
+    --bg-main: var(--background);
+    --bg-card: var(--surface);
+    --bg-card-hover: var(--surface-hover);
+    --bg-glass: rgba(255, 255, 255, 0.6);
     
-    /* Transitions */
-    --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-base: 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
-    --transition-slow: 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+    /* Text aliasing */
+    --text-dark: var(--text-primary);
+    --text-body: var(--text-secondary);
+    --text-muted: var(--text-tertiary);
     
-    /* Typography */
-    --font-heading: 'Plus Jakarta Sans', sans-serif;
-    --font-body: 'Manrope', sans-serif;
-    --font-stats: 'Space Grotesk', sans-serif;
+    /* Font aliasing */
+    --font-heading: var(--font-family);
+    --font-body: var(--font-family);
+    --font-stats: var(--font-family);
 }
 
 /* ----------------------------------------------------------------------
@@ -69,9 +43,6 @@ body {
     color: var(--text-body);
     overflow-x: hidden;
     line-height: 1.6;
-    background-image: radial-gradient(circle at 100% 0%, rgba(124, 154, 134, 0.05) 0%, transparent 40%),
-                      radial-gradient(circle at 0% 100%, rgba(230, 181, 102, 0.05) 0%, transparent 40%);
-    background-attachment: fixed;
 }
 
 /* Dashboard Shell Grid */
@@ -95,6 +66,9 @@ body {
     transition: width var(--transition-base);
     z-index: 1000;
     position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
     height: 100vh;
     box-shadow: var(--shadow-md);
 }
@@ -247,28 +221,15 @@ body {
 
 /* Active Tab: Creative Gradient Pill with Shimmer & Glowing Indicator */
 .menu-item.active {
-    background: linear-gradient(135deg, #7C9A86 0%, #5B7A66 100%) !important;
-    color: #ffffff !important;
+    background: var(--primary-light) !important;
+    color: var(--primary) !important;
     font-weight: 700;
-    border-color: rgba(255, 255, 255, 0.25);
-    animation: tabPulseGlow 3s infinite ease-in-out;
-    transform: translateX(6px);
+    border-radius: var(--radius-lg);
 }
 
-/* Shimmer animation light effect across active tab */
-.menu-item.active::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 50%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.28), transparent);
-    transform: skewX(-20deg);
-    animation: shimmerSlide 4s infinite linear;
-}
+/* Removed shimmer animation to keep UI minimal and clean */
 
-/* Glowing gold left bar indicator for active tab */
+/* Clean active indicator */
 .menu-item.active::before {
     content: '';
     position: absolute;
@@ -277,15 +238,13 @@ body {
     transform: translateY(-50%);
     width: 4px;
     height: 55%;
-    background: #E6B566;
+    background: var(--primary);
     border-radius: 4px;
-    box-shadow: 0 0 10px #E6B566;
 }
 
 .menu-item.active i {
-    color: #ffffff !important;
+    color: var(--primary) !important;
     transform: scale(1.15);
-    background: rgba(255, 255, 255, 0.22);
 }
 
 /* User Profile Badge at Bottom of Sidebar */
@@ -364,14 +323,15 @@ body {
 /* Topbar */
 .topbar {
     height: var(--topbar-height);
-    background: rgba(253, 251, 247, 0.85);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.02);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 2rem;
+    padding: 0 24px;
     position: sticky;
     top: 0;
     z-index: 999;
@@ -398,36 +358,69 @@ body {
 }
 
 /* Search Bar */
+.search-form-container {
+    margin: 0;
+    padding: 0;
+    border: none;
+    background: transparent;
+}
 .search-bar {
     position: relative;
-    width: 300px;
+    width: 400px;
+    max-width: 420px;
+    min-width: 340px;
+    display: flex;
+    align-items: center;
 }
-
-.search-bar i {
-    position: absolute;
-    left: 14px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--text-muted);
-}
-
 .search-bar input {
     width: 100%;
-    padding: 10px 15px 10px 40px;
-    border-radius: 20px;
+    height: 48px;
+    padding: 0 40px 0 56px;
+    border-radius: 16px;
     border: 1px solid rgba(0,0,0,0.08);
-    background: rgba(255,255,255,0.7);
+    background: rgba(255,255,255,0.9);
     font-family: var(--font-body);
-    font-size: 0.9rem;
+    font-size: 0.95rem;
     color: var(--text-dark);
-    transition: all var(--transition-base);
+    transition: all var(--transition-fast);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.02);
 }
-
+.search-bar input::placeholder {
+    color: #94A3B8;
+}
 .search-bar input:focus {
     outline: none;
+    border-color: var(--success);
     background: white;
-    border-color: var(--primary-light);
-    box-shadow: 0 0 0 4px rgba(124, 154, 134, 0.1);
+    box-shadow: 0 0 0 3px rgba(124, 154, 134, 0.25), 0 4px 12px rgba(0,0,0,0.05);
+}
+.search-bar i.search-icon {
+    position: absolute;
+        left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94A3B8;
+    font-size: 18px;
+    pointer-events: none;
+    transition: color var(--transition-fast);
+}
+.search-bar input:focus ~ i.search-icon {
+    color: var(--success);
+}
+.shortcut-hint {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0,0,0,0.04);
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 6px;
+    padding: 2px 8px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    pointer-events: none;
+    font-family: monospace;
 }
 
 /* Topbar Actions */
@@ -435,27 +428,33 @@ body {
     position: relative;
     background: white;
     border: 1px solid rgba(0,0,0,0.05);
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     color: var(--text-body);
     cursor: pointer;
-    transition: all var(--transition-base);
-    box-shadow: var(--shadow-sm);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.03);
 }
 
 .action-btn:hover {
     color: var(--primary);
     transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.08);
 }
-
+.action-btn.user-avatar {
+    font-weight: 700;
+    font-size: 1.1rem;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
 .badge {
     position: absolute;
     top: -2px;
+    right: -2px;
+
     right: -2px;
     background: var(--danger);
     color: white;
@@ -1107,12 +1106,15 @@ body {
 }
 
 /* Subtle Pulse Glow for Live Status Badges */
-@keyframes subtlePulseGlow {
-    0%, 100% {
-        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.3);
+@keyframes pulseIndicator {
+    0% {
+        box-shadow: 0 0 0 0 rgba(124, 154, 134, 0.3);
     }
-    50% {
-        box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+    70% {
+        box-shadow: 0 0 0 6px rgba(124, 154, 134, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(124, 154, 134, 0);
     }
 }
 

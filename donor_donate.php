@@ -73,221 +73,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // Handle PRG order created state
 $orderCreated = false;
 $orderData = null;
-if (isset($_GET['status']) && $_GET['status'] === 'order_created' && isset($_SESSION['order_created'])) {
+if (isset($_GET['status']) && ($_GET['status'] ?? '') === 'order_created' && isset($_SESSION['order_created'])) {
     $orderCreated = true;
     $orderData = $_SESSION['order_data'];
     unset($_SESSION['order_created'], $_SESSION['order_data']);
 }
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Donate to <?php echo htmlspecialchars($campaign['name']); ?> | <?php echo APP_NAME; ?></title>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="assets/css/dashboard.css">
-    <style>
-        .donation-container {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        .preset-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-        .preset-btn {
-            background: white;
-            border: 2px solid #e2e8f0;
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: var(--text-dark);
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .preset-btn:hover {
-            border-color: var(--primary-light);
-            background: #f8fafc;
-        }
-        .preset-btn.active {
-            border-color: var(--primary);
-            background: rgba(59,130,246,0.05);
-            color: var(--primary);
-        }
-        .custom-amount-wrapper {
-            position: relative;
-            margin-bottom: 30px;
-        }
-        .custom-amount-wrapper span {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--text-muted);
-        }
-        .custom-amount-input {
-            width: 100%;
-            padding: 20px 20px 20px 40px;
-            font-size: 1.5rem;
-            font-weight: 700;
-            border: 2px solid #e2e8f0;
-            border-radius: 10px;
-            transition: border-color 0.2s;
-            font-family: inherit;
-        }
-        .custom-amount-input:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
-        .secure-payment-panel {
-            background: white;
-            border: 2px solid #e2e8f0;
-            border-radius: 15px;
-            overflow: hidden;
-            margin-bottom: 30px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        .secure-payment-panel:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.15);
-            border-color: var(--primary-light);
-        }
-        .panel-header {
-            background: rgba(59, 130, 246, 0.05);
-            padding: 15px 20px;
-            display: flex;
-            align-items: center;
-            border-bottom: 2px solid #e2e8f0;
-        }
-        .panel-header i {
-            color: var(--primary);
-            font-size: 1.2rem;
-            margin-right: 10px;
-        }
-        .panel-header span {
-            font-weight: 700;
-            color: var(--text-dark);
-            font-size: 1.1rem;
-            flex-grow: 1;
-        }
-        .powered-by {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-        }
-        .powered-by strong {
-            color: #0b2239; /* Razorpay brand color */
-        }
-        .panel-body {
-            padding: 20px;
-        }
-        .accepted-text {
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: var(--text-muted);
-            margin-bottom: 15px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .methods-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 15px;
-        }
-        .method-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 15px 10px;
-            background: #f8fafc;
-            border-radius: 10px;
-            text-align: center;
-            gap: 8px;
-            color: var(--text-dark);
-            font-weight: 600;
-            font-size: 0.85rem;
-            border: 1px solid transparent;
-            transition: all 0.2s;
-        }
-        .method-item:hover {
-            background: white;
-            border-color: var(--primary-light);
-            color: var(--primary);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-        }
-        .method-item i {
-            font-size: 1.5rem;
-            color: var(--text-muted);
-            transition: color 0.2s;
-        }
-        .method-item:hover i {
-            color: var(--primary);
-        }
-        .trust-section {
-            margin-top: 25px;
-            text-align: center;
-        }
-        .trust-title {
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            margin-bottom: 15px;
-            font-weight: 500;
-        }
-        .trust-badges {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-        .trust-badges span {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: var(--text-dark);
-            background: #f1f5f9;
-            padding: 6px 12px;
-            border-radius: 20px;
-        }
-        .trust-badges span i {
-            color: var(--success);
-        }
-        .pulse-hover {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .pulse-hover:hover {
-            transform: scale(1.02);
-        }
-        .success-box {
-            background: rgba(16,185,129,0.1);
-            border: 2px solid var(--success);
-            padding: 40px;
-            border-radius: 15px;
-            text-align: center;
-        }
-    </style>
-</head>
-<body>
-<div class="dashboard-layout">
-    <?php include __DIR__ . '/includes/dashboard/sidebar.php'; ?>
-    <main class="main-content">
-        <?php include __DIR__ . '/includes/dashboard/topbar.php'; ?>
+<?php 
+$page_title = "Donate to";
+require_once __DIR__ . '/includes/dashboard/layout_header.php'; 
+?>
         <div class="page-content">
             
-            <a href="donor_campaign_details.php?id=<?php echo $campaign['id']; ?>" style="display: inline-block; margin-bottom: 15px; text-decoration: none; color: var(--text-muted); font-size: 0.9rem;">
+            <a href="donor_campaign_details.php?id=<?php echo $campaign['id'] ?? ''; ?>" style="display: inline-block; margin-bottom: 15px; text-decoration: none; color: var(--text-muted); font-size: 0.9rem;">
                 <i class="fas fa-arrow-left"></i> Back to Campaign
             </a>
 
@@ -307,11 +105,11 @@ if (isset($_GET['status']) && $_GET['status'] === 'order_created' && isset($_SES
                     <script>
                         var options = {
                             "key": "<?php echo htmlspecialchars(RAZORPAY_KEY_ID); ?>",
-                            "amount": "<?php echo htmlspecialchars($orderData['amount']); ?>",
-                            "currency": "<?php echo htmlspecialchars($orderData['currency']); ?>",
+                            "amount": "<?php echo htmlspecialchars($orderData['amount'] ?? ''); ?>",
+                            "currency": "<?php echo htmlspecialchars($orderData['currency'] ?? ''); ?>",
                             "name": "<?php echo htmlspecialchars(APP_NAME); ?>",
-                            "description": "Donation for <?php echo addslashes(htmlspecialchars($campaign['name'])); ?>",
-                            "order_id": "<?php echo htmlspecialchars($orderData['id']); ?>",
+                            "description": "Donation for <?php echo addslashes(htmlspecialchars($campaign['name'] ?? '')); ?>",
+                            "order_id": "<?php echo htmlspecialchars($orderData['id'] ?? ''); ?>",
                             "handler": function (response){
                                 document.getElementById('payment-status-message').innerHTML = '<span style="color: var(--success);"><i class="fas fa-spinner fa-spin"></i> Verifying payment...</span>';
                                 
@@ -377,13 +175,13 @@ if (isset($_GET['status']) && $_GET['status'] === 'order_created' && isset($_SES
                         <div class="glass-card" style="text-align: center; padding: 40px;">
                             <i class="fas fa-exclamation-triangle fa-3x" style="color: var(--warning); margin-bottom: 20px;"></i>
                             <h2>Campaign Inactive</h2>
-                            <p style="color: var(--text-muted);">This campaign is currently marked as <strong><?php echo htmlspecialchars($campaign['status']); ?></strong> and is not accepting new donations.</p>
+                            <p style="color: var(--text-muted);">This campaign is currently marked as <strong><?php echo htmlspecialchars($campaign['status'] ?? ''); ?></strong> and is not accepting new donations.</p>
                         </div>
                     <?php else: ?>
                         
                         <div class="glass-card" style="margin-bottom: 20px; padding: 20px; background: rgba(59,130,246,0.05); border-left: 4px solid var(--primary);">
                             <h3 style="margin: 0 0 5px 0; color: var(--text-dark); font-size: 1.1rem;">You are donating to:</h3>
-                            <strong style="color: var(--primary); font-size: 1.2rem;"><?php echo htmlspecialchars($campaign['name']); ?></strong>
+                            <strong style="color: var(--primary); font-size: 1.2rem;"><?php echo htmlspecialchars($campaign['name'] ?? ''); ?></strong>
                         </div>
 
                         <?php if ($error): ?>
@@ -394,7 +192,7 @@ if (isset($_GET['status']) && $_GET['status'] === 'order_created' && isset($_SES
 
                         <div class="glass-card">
                             <form action="" method="POST" id="donationForm">
-                                <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+                                <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token'] ?? ''; ?>">
                                 <input type="hidden" name="amount" id="presetAmount" value="">
 
                                 <h3 style="margin-top: 0; color: var(--text-dark); margin-bottom: 20px;">Select Amount</h3>
@@ -470,10 +268,7 @@ if (isset($_GET['status']) && $_GET['status'] === 'order_created' && isset($_SES
             </div>
 
         </div>
-    </main>
-</div>
-
-<script>
+    <script>
     // JS for donation interactions
     document.addEventListener('DOMContentLoaded', () => {
         const presetBtns = document.querySelectorAll('.preset-btn');
@@ -519,6 +314,4 @@ if (isset($_GET['status']) && $_GET['status'] === 'order_created' && isset($_SES
         }
     });
 </script>
-<script src="assets/js/dashboard.js"></script>
-</body>
-</html>
+<?php require_once __DIR__ . '/includes/dashboard/layout_footer.php'; ?>

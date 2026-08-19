@@ -39,29 +39,10 @@ try {
     $user = null;
 }
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Activity | <?php echo htmlspecialchars(APP_NAME); ?></title>
-    
-    <!-- Premium Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Dashboard Core CSS -->
-    <link rel="stylesheet" href="assets/css/dashboard.css">
-</head>
-<body>
-
-<div class="dashboard-layout">
-    <!-- Sidebar -->
-    <?php include __DIR__ . '/includes/dashboard/sidebar.php'; ?>
-
-    <main class="main-content">
-        <!-- Topbar -->
-        <?php include __DIR__ . '/includes/dashboard/topbar.php'; ?>
+<?php 
+$page_title = "User Activity";
+require_once __DIR__ . '/includes/dashboard/layout_header.php'; 
+?>
 
         <div class="page-content">
             <!-- Header Section -->
@@ -89,8 +70,8 @@ try {
                     <i class="fas fa-user"></i>
                 </div>
                 <div>
-                    <h2 style="margin: 0; font-size: 1.2rem; color: var(--text-dark);"><?php echo htmlspecialchars($user['full_name']); ?></h2>
-                    <p style="margin: 5px 0 0 0; color: var(--text-muted);"><?php echo htmlspecialchars($user['email']); ?> &bull; <?php echo htmlspecialchars($user['role_name']); ?></p>
+                    <h2 style="margin: 0; font-size: 1.2rem; color: var(--text-dark);"><?php echo htmlspecialchars($user['full_name'] ?? ''); ?></h2>
+                    <p style="margin: 5px 0 0 0; color: var(--text-muted);"><?php echo htmlspecialchars($user['email'] ?? ''); ?> &bull; <?php echo htmlspecialchars($user['role_name'] ?? ''); ?></p>
                 </div>
             </div>
 
@@ -115,11 +96,11 @@ try {
                                     <td style="white-space: nowrap;"><?php echo date('M d, Y H:i:s', strtotime($log['timestamp'])); ?></td>
                                     <td>
                                         <span class="badge" style="background: rgba(0,0,0,0.05); color: var(--text-dark);">
-                                            <?php echo htmlspecialchars($log['module']); ?>
+                                            <?php echo htmlspecialchars($log['module'] ?? ''); ?>
                                         </span>
                                     </td>
-                                    <td style="font-weight: 500; color: var(--text-dark);"><?php echo htmlspecialchars($log['action']); ?></td>
-                                    <td style="font-family: monospace; color: var(--text-muted);"><?php echo htmlspecialchars($log['ip_address']); ?></td>
+                                    <td style="font-weight: 500; color: var(--text-dark);"><?php echo htmlspecialchars($log['action'] ?? ''); ?></td>
+                                    <td style="font-family: monospace; color: var(--text-muted);"><?php echo htmlspecialchars($log['ip_address'] ?? ''); ?></td>
                                 </tr>
                                 <?php endforeach; ?>
                             </tbody>
@@ -129,9 +110,5 @@ try {
             </div>
             
         </div>
-    </main>
-</div>
-
-<script src="assets/js/dashboard.js"></script>
-</body>
-</html>
+    
+<?php require_once __DIR__ . '/includes/dashboard/layout_footer.php'; ?>

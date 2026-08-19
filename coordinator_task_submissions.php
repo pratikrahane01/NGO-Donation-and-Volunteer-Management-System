@@ -94,53 +94,10 @@ $stmt->execute([$coordinator_id]);
 $submissions = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Task Submissions | <?php echo APP_NAME; ?></title>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="assets/css/dashboard.css">
-    
-    <style>
-        .submission-card {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
-        }
-        .proof-file {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 15px;
-            background: rgba(124, 154, 134, 0.1);
-            color: var(--primary);
-            border-radius: 20px;
-            text-decoration: none;
-            font-size: 0.85rem;
-            margin-right: 10px;
-            margin-bottom: 10px;
-            transition: background 0.3s ease;
-        }
-        .proof-file:hover {
-            background: rgba(124, 154, 134, 0.2);
-        }
-    </style>
-</head>
-<body>
-
-<div class="dashboard-layout">
-    <?php include __DIR__ . '/includes/dashboard/sidebar.php'; ?>
-    <main class="main-content">
-        <?php include __DIR__ . '/includes/dashboard/topbar.php'; ?>
+<?php 
+$page_title = "Task Submissions";
+require_once __DIR__ . '/includes/dashboard/layout_header.php'; 
+?>
 
         <div class="page-content">
             <div class="page-header" style="margin-bottom: 30px;">
@@ -166,26 +123,26 @@ $submissions = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px;">
                                 <div style="display: flex; gap: 15px; align-items: center;">
                                     <?php 
-                                    $profile_img = $sub['profile_image'] ? 'uploads/profiles/' . htmlspecialchars($sub['profile_image']) : 'assets/images/default-avatar.png';
+                                    $profile_img = $sub['profile_image'] ? 'uploads/profiles/' . htmlspecialchars($sub['profile_image'] ?? '') : 'assets/images/default-avatar.png';
                                     ?>
                                     <img src="<?php echo $profile_img; ?>" alt="Profile" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;">
                                     <div>
-                                        <h3 style="margin: 0; font-size: 1.1rem; color: var(--text-dark);"><?php echo htmlspecialchars($sub['volunteer_name']); ?></h3>
+                                        <h3 style="margin: 0; font-size: 1.1rem; color: var(--text-dark);"><?php echo htmlspecialchars($sub['volunteer_name'] ?? ''); ?></h3>
                                         <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 5px;">
                                             <i class="far fa-clock"></i> Submitted: <?php echo date('M d, Y h:i A', strtotime($sub['submitted_at'])); ?>
                                         </div>
                                     </div>
                                 </div>
                                 <div style="text-align: right;">
-                                    <strong style="display: block; color: var(--primary); font-size: 1.1rem;"><?php echo htmlspecialchars($sub['task_name']); ?></strong>
-                                    <span style="font-size: 0.85rem; color: var(--text-muted);"><i class="fas fa-calendar-alt"></i> <?php echo htmlspecialchars($sub['event_title']); ?></span>
+                                    <strong style="display: block; color: var(--primary); font-size: 1.1rem;"><?php echo htmlspecialchars($sub['task_name'] ?? ''); ?></strong>
+                                    <span style="font-size: 0.85rem; color: var(--text-muted);"><i class="fas fa-calendar-alt"></i> <?php echo htmlspecialchars($sub['event_title'] ?? ''); ?></span>
                                 </div>
                             </div>
                             
                             <div style="margin-bottom: 20px;">
                                 <h4 style="margin: 0 0 10px 0; font-size: 1rem; color: var(--text-dark);">Work Summary</h4>
                                 <p style="margin: 0; color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; background: rgba(0,0,0,0.02); padding: 15px; border-radius: 8px;">
-                                    <?php echo nl2br(htmlspecialchars($sub['summary'])); ?>
+                                    <?php echo nl2br(htmlspecialchars($sub['summary'] ?? '')); ?>
                                 </p>
                             </div>
 
@@ -194,19 +151,19 @@ $submissions = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     <?php if ($sub['hours_contributed']): ?>
                                         <div>
                                             <strong style="display: block; font-size: 0.85rem; color: var(--text-dark); margin-bottom: 5px;">Hours Contributed</strong>
-                                            <span style="color: var(--primary); font-weight: 600; font-size: 1.2rem;"><?php echo htmlspecialchars($sub['hours_contributed']); ?> <small style="font-size: 0.8rem; font-weight: normal; color: var(--text-muted);">hrs</small></span>
+                                            <span style="color: var(--primary); font-weight: 600; font-size: 1.2rem;"><?php echo htmlspecialchars($sub['hours_contributed'] ?? ''); ?> <small style="font-size: 0.8rem; font-weight: normal; color: var(--text-muted);">hrs</small></span>
                                         </div>
                                     <?php endif; ?>
                                     <?php if ($sub['challenges_faced']): ?>
                                         <div>
                                             <strong style="display: block; font-size: 0.85rem; color: var(--text-dark); margin-bottom: 5px;">Challenges Faced</strong>
-                                            <span style="color: var(--text-muted); font-size: 0.9rem;"><?php echo htmlspecialchars($sub['challenges_faced']); ?></span>
+                                            <span style="color: var(--text-muted); font-size: 0.9rem;"><?php echo htmlspecialchars($sub['challenges_faced'] ?? ''); ?></span>
                                         </div>
                                     <?php endif; ?>
                                     <?php if ($sub['suggestions']): ?>
                                         <div>
                                             <strong style="display: block; font-size: 0.85rem; color: var(--text-dark); margin-bottom: 5px;">Suggestions</strong>
-                                            <span style="color: var(--text-muted); font-size: 0.9rem;"><?php echo htmlspecialchars($sub['suggestions']); ?></span>
+                                            <span style="color: var(--text-muted); font-size: 0.9rem;"><?php echo htmlspecialchars($sub['suggestions'] ?? ''); ?></span>
                                         </div>
                                     <?php endif; ?>
                                 </div>
@@ -230,10 +187,10 @@ $submissions = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                             <div style="border-top: 1px solid var(--border-color); padding-top: 15px; margin-top: 15px;">
                                 <form method="POST" style="display: flex; gap: 15px; flex-wrap: wrap; align-items: flex-end;">
-                                    <input type="hidden" name="submission_id" value="<?php echo $sub['id']; ?>">
+                                    <input type="hidden" name="submission_id" value="<?php echo $sub['id'] ?? ''; ?>">
                                     <div style="flex: 1; min-width: 250px;">
                                         <label style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-dark); margin-bottom: 8px;">Feedback (Required for Revision)</label>
-                                        <textarea name="feedback" rows="2" class="modern-input" placeholder="Enter feedback or praise here..." style="resize: vertical;"></textarea>
+                                        <textarea name="feedback" rows="2" class="modern-input form-control" placeholder="Enter feedback or praise here..." style="resize: vertical;"></textarea>
                                     </div>
                                     <div style="display: flex; gap: 10px;">
                                         <button type="submit" name="action" value="request_revision" class="btn-primary" style="background: var(--warning); padding: 10px 20px;">
@@ -250,10 +207,5 @@ $submissions = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 </div>
             <?php endif; ?>
         </div>
-    </main>
-</div>
-
-<script src="assets/js/dashboard.js"></script>
-
-</body>
-</html>
+    
+<?php require_once __DIR__ . '/includes/dashboard/layout_footer.php'; ?>

@@ -22,34 +22,10 @@ $assignedTasks = $dashboardData['assignedTasks'];
 $recentActivity = $dashboardData['recentActivity'];
 $notifications = $dashboardData['notifications'];
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Volunteer Dashboard | <?php echo APP_NAME; ?></title>
-    
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-    
-    <!-- FontAwesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="assets/css/dashboard.css">
-</head>
-<body>
-
-<div class="dashboard-layout">
-    <!-- Sidebar -->
-    <?php include __DIR__ . '/includes/dashboard/sidebar.php'; ?>
-
-    <!-- Main Content -->
-    <main class="main-content">
-        <!-- Topbar -->
-        <?php include __DIR__ . '/includes/dashboard/topbar.php'; ?>
+<?php 
+$page_title = "Volunteer Dashboard";
+require_once __DIR__ . '/includes/dashboard/layout_header.php'; 
+?>
 
         <div class="page-content">
             
@@ -98,10 +74,10 @@ $notifications = $dashboardData['notifications'];
                                     <tr>
                                         <td>
                                             <a href="volunteer_tasks.php" style="text-decoration: none;">
-                                                <strong style="color: var(--text-dark); display:block;"><?php echo htmlspecialchars($task['task_name']); ?></strong>
+                                                <strong style="color: var(--text-dark); display:block;"><?php echo htmlspecialchars($task['task_name'] ?? ''); ?></strong>
                                             </a>
                                         </td>
-                                        <td><span style="font-size: 0.85rem; color: var(--text-muted);"><?php echo htmlspecialchars($task['event_title']); ?></span></td>
+                                        <td><span style="font-size: 0.85rem; color: var(--text-muted);"><?php echo htmlspecialchars($task['event_title'] ?? ''); ?></span></td>
                                         <td>
                                             <?php 
                                             $prioClass = 'status-pending';
@@ -130,12 +106,12 @@ $notifications = $dashboardData['notifications'];
                         <div class="activity-timeline">
                             <?php foreach($recentActivity as $activity): ?>
                                 <div class="timeline-item" style="display: flex; gap: 15px; margin-bottom: 20px;">
-                                    <div class="timeline-icon" style="width: 40px; height: 40px; border-radius: 50%; background: <?php echo $activity['color']; ?>20; color: <?php echo $activity['color']; ?>; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1.2rem;">
-                                        <i class="<?php echo $activity['icon']; ?>"></i>
+                                    <div class="timeline-icon" style="width: 40px; height: 40px; border-radius: 50%; background: <?php echo $activity['color'] ?? ''; ?>20; color: <?php echo $activity['color'] ?? ''; ?>; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1.2rem;">
+                                        <i class="<?php echo $activity['icon'] ?? ''; ?>"></i>
                                     </div>
                                     <div class="timeline-content">
-                                        <strong style="color: var(--text-dark); display: block; font-size: 0.95rem;"><?php echo htmlspecialchars($activity['description']); ?></strong>
-                                        <span style="font-size: 0.85rem; color: var(--text-body);"><?php echo htmlspecialchars($activity['title']); ?></span>
+                                        <strong style="color: var(--text-dark); display: block; font-size: 0.95rem;"><?php echo htmlspecialchars($activity['description'] ?? ''); ?></strong>
+                                        <span style="font-size: 0.85rem; color: var(--text-body);"><?php echo htmlspecialchars($activity['title'] ?? ''); ?></span>
                                         <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;"><i class="far fa-clock"></i> <?php echo date('M d, g:i A', strtotime($activity['event_date'])); ?></div>
                                     </div>
                                 </div>
@@ -172,15 +148,15 @@ $notifications = $dashboardData['notifications'];
                                     <tr>
                                         <td>
                                             <a href="volunteer_events.php" style="text-decoration: none;">
-                                                <strong style="color: var(--text-dark);"><?php echo htmlspecialchars($evt['title']); ?></strong>
+                                                <strong style="color: var(--text-dark);"><?php echo htmlspecialchars($evt['title'] ?? ''); ?></strong>
                                             </a>
                                         </td>
-                                        <td><span style="font-size: 0.85rem; font-weight: 600; color: var(--primary-dark);"><?php echo htmlspecialchars($evt['coordinator_name']); ?></span></td>
+                                        <td><span style="font-size: 0.85rem; font-weight: 600; color: var(--primary-dark);"><?php echo htmlspecialchars($evt['coordinator_name'] ?? ''); ?></span></td>
                                         <td>
                                             <div style="font-size: 0.85rem; color: var(--text-dark); font-weight: 600;"><?php echo date('M d, Y', strtotime($evt['event_date'])); ?></div>
                                             <div style="font-size: 0.75rem; color: var(--text-muted);"><?php echo date('g:i A', strtotime($evt['event_time'])); ?></div>
                                         </td>
-                                        <td><span style="font-size: 0.85rem; color: var(--text-muted);"><i class="fas fa-map-marker-alt"></i> <?php echo htmlspecialchars($evt['venue']); ?></span></td>
+                                        <td><span style="font-size: 0.85rem; color: var(--text-muted);"><i class="fas fa-map-marker-alt"></i> <?php echo htmlspecialchars($evt['venue'] ?? ''); ?></span></td>
                                     </tr>
                                     <?php endforeach; ?>
                                 </tbody>
@@ -205,8 +181,8 @@ $notifications = $dashboardData['notifications'];
                                             <i class="fas fa-bell"></i>
                                         </div>
                                         <div>
-                                            <strong style="color: var(--text-dark); display: block; font-size: 0.95rem;"><?php echo htmlspecialchars($notif['title']); ?></strong>
-                                            <p style="font-size: 0.85rem; color: var(--text-body); margin: 4px 0;"><?php echo htmlspecialchars($notif['message']); ?></p>
+                                            <strong style="color: var(--text-dark); display: block; font-size: 0.95rem;"><?php echo htmlspecialchars($notif['title'] ?? ''); ?></strong>
+                                            <p style="font-size: 0.85rem; color: var(--text-body); margin: 4px 0;"><?php echo htmlspecialchars($notif['message'] ?? ''); ?></p>
                                             <span style="font-size: 0.75rem; color: var(--text-muted);"><i class="far fa-clock"></i> <?php echo date('M d, g:i A', strtotime($notif['created_at'])); ?></span>
                                         </div>
                                     </a>
@@ -218,11 +194,5 @@ $notifications = $dashboardData['notifications'];
             </div>
 
         </div>
-    </main>
-</div>
-
-<!-- Dashboard Interactive Logic -->
-<script src="assets/js/dashboard.js"></script>
-
-</body>
-</html>
+    
+<?php require_once __DIR__ . '/includes/dashboard/layout_footer.php'; ?>

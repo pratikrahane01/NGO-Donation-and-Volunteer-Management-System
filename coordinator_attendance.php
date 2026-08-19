@@ -52,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         
                         foreach ($attendance_data as $reg_id => $data) {
                             $vol_id = filter_var($data['vol_id'], FILTER_VALIDATE_INT);
-                            $status = htmlspecialchars($data['status']);
+                            $status = htmlspecialchars($data['status'] ?? '');
                             $check_in = !empty($data['check_in']) ? $data['check_in'] : null;
                             $check_out = !empty($data['check_out']) ? $data['check_out'] : null;
                             
@@ -82,7 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $check->execute([$evt_id]);
                 $evtData = $check->fetch(PDO::FETCH_ASSOC);
 
-                if ($evtData && $evtData['coordinator_id'] == $_SESSION['user_id']) {
+                if ($evtData && ($evtData['coordinator_id'] ?? '') == $_SESSION['user_id']) {
                     $new_status = $evtData['is_attendance_open'] ? 0 : 1;
                     $pdo->prepare("UPDATE events SET is_attendance_open = ? WHERE id = ?")->execute([$new_status, $evt_id]);
                     $success_msg = $new_status ? "Attendance session opened for self-check-in." : "Attendance session closed.";
@@ -168,24 +168,10 @@ try {
     $error_msg = "Database error: " . $e->getMessage();
 }
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Attendance Tracking | <?php echo htmlspecialchars(APP_NAME); ?></title>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="assets/css/dashboard.css">
-</head>
-<body>
-
-<div class="dashboard-layout">
-    <?php include __DIR__ . '/includes/dashboard/sidebar.php'; ?>
-
-    <main class="main-content">
-        <?php include __DIR__ . '/includes/dashboard/topbar.php'; ?>
+<?php 
+$page_title = "Attendance Tracking";
+require_once __DIR__ . '/includes/dashboard/layout_header.php'; 
+?>
 
         <div class="page-content">
             <div class="page-header">
@@ -210,13 +196,13 @@ try {
             <!-- Filter Bar -->
             <div class="glass-card" style="margin-bottom: 20px;">
                 <form method="GET" action="coordinator_attendance.php" class="filter-bar" id="filterForm">
-                    <input type="text" name="search" placeholder="Search volunteer..." value="<?php echo htmlspecialchars($search); ?>">
+                    <input class="form-control" type="text" name="search" placeholder="Search volunteer..." value="<?php echo htmlspecialchars($search); ?>">
                     
-                    <select name="event_id" id="event_select" onchange="document.getElementById('loadingOverlay').style.display='flex'; document.getElementById('attendanceContainer').style.display='none'; this.form.submit();">
+                    <select class="form-control" name="event_id" id="event_select" onchange="document.getElementById('loadingOverlay').style.display='flex'; document.getElementById('attendanceContainer').style.display='none'; this.form.submit();">
                         <option value="">Select an Event</option>
                         <?php foreach($allEvents as $ev): ?>
-                            <option value="<?php echo $ev['id']; ?>" <?php echo $event_filter == $ev['id'] ? 'selected' : ''; ?>>
-                                <?php echo htmlspecialchars($ev['title']); ?>
+                            <option value="<?php echo $ev['id'] ?? ''; ?>" <?php echo $event_filter == $ev['id'] ? 'selected' : ''; ?>>
+                                <?php echo htmlspecialchars($ev['title'] ?? ''); ?>
                             </option>
                         <?php endforeach; ?>
                     </select>
@@ -244,7 +230,7 @@ try {
                         <p style="margin: 5px 0 0 0; color: var(--text-muted); font-size: 0.9rem;">When open, volunteers can self-check-in from their dashboard.</p>
                     </div>
                     <form method="POST" action="coordinator_attendance.php">
-                        <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+                        <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token'] ?? ''; ?>">
                         <input type="hidden" name="action" value="toggle_attendance">
                         <input type="hidden" name="evt_id" value="<?php echo htmlspecialchars($event_filter); ?>">
                         <button type="submit" class="btn-primary" style="background: <?php echo $is_open ? 'var(--danger)' : 'var(--success)'; ?>; border: none; padding: 10px 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
@@ -263,7 +249,7 @@ try {
                     <?php render_empty_state('No Volunteers Found', 'No approved volunteers are assigned to this event.', 'fas fa-users-slash'); ?>
                 <?php else: ?>
                     <form method="POST" action="coordinator_attendance.php" id="bulkAttendanceForm">
-                        <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+                        <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token'] ?? ''; ?>">
                         <input type="hidden" name="action" value="bulk_update_attendance">
                         <input type="hidden" name="evt_id" value="<?php echo htmlspecialchars($event_filter); ?>">
                         <div class="table-responsive" style="margin-bottom: 20px;">
@@ -280,23 +266,23 @@ try {
                                     <?php foreach ($registrations as $reg): ?>
                                     <tr>
                                         <td>
-                                            <div style="font-weight: 600; color: var(--text-dark);"><?php echo htmlspecialchars($reg['full_name']); ?></div>
-                                            <div style="font-size: 0.8rem; color: var(--text-muted);"><?php echo htmlspecialchars($reg['email']); ?></div>
-                                            <input type="hidden" name="attendance[<?php echo $reg['id']; ?>][vol_id]" value="<?php echo $reg['volunteer_id']; ?>">
+                                            <div style="font-weight: 600; color: var(--text-dark);"><?php echo htmlspecialchars($reg['full_name'] ?? ''); ?></div>
+                                            <div style="font-size: 0.8rem; color: var(--text-muted);"><?php echo htmlspecialchars($reg['email'] ?? ''); ?></div>
+                                            <input type="hidden" name="attendance[<?php echo $reg['id'] ?? ''; ?>][vol_id]" value="<?php echo $reg['volunteer_id'] ?? ''; ?>">
                                         </td>
                                         <td>
                                             <?php $att_status = $reg['specific_attendance'] ?: 'absent'; ?>
-                                            <select name="attendance[<?php echo $reg['id']; ?>][status]" style="padding: 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-dark); width: 100%;">
+                                            <select class="form-control" name="attendance[<?php echo $reg['id'] ?? ''; ?>][status]" style="padding: 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-dark); width: 100%;">
                                                 <option value="present" <?php echo $att_status == 'present' ? 'selected' : ''; ?>>Present</option>
                                                 <option value="late" <?php echo $att_status == 'late' ? 'selected' : ''; ?>>Late</option>
                                                 <option value="absent" <?php echo $att_status == 'absent' ? 'selected' : ''; ?>>Absent</option>
                                             </select>
                                         </td>
                                         <td>
-                                            <input type="time" name="attendance[<?php echo $reg['id']; ?>][check_in]" value="<?php echo $reg['check_in'] ? date('H:i', strtotime($reg['check_in'])) : ''; ?>" style="padding: 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-dark);">
+                                            <input type="time" name="attendance[<?php echo $reg['id'] ?? ''; ?>][check_in]" value="<?php echo $reg['check_in'] ? date('H:i', strtotime($reg['check_in'])) : ''; ?>" style="padding: 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-dark);">
                                         </td>
                                         <td>
-                                            <input type="time" name="attendance[<?php echo $reg['id']; ?>][check_out]" value="<?php echo $reg['check_out'] ? date('H:i', strtotime($reg['check_out'])) : ''; ?>" style="padding: 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-dark);">
+                                            <input type="time" name="attendance[<?php echo $reg['id'] ?? ''; ?>][check_out]" value="<?php echo $reg['check_out'] ? date('H:i', strtotime($reg['check_out'])) : ''; ?>" style="padding: 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-dark);">
                                         </td>
                                     </tr>
                                     <?php endforeach; ?>
@@ -325,11 +311,7 @@ try {
                 <?php endif; ?>
             </div>
         </div>
-    </main>
-</div>
-
-<script src="assets/js/dashboard.js"></script>
-<script>
+    <script>
     document.addEventListener("DOMContentLoaded", function() {
         const form = document.getElementById('bulkAttendanceForm');
         if (form) {
@@ -351,5 +333,4 @@ try {
         }
     });
 </script>
-</body>
-</html>
+<?php require_once __DIR__ . '/includes/dashboard/layout_footer.php'; ?>

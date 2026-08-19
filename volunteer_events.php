@@ -31,25 +31,10 @@ try {
     error_log("Volunteer Events Error: " . $e->getMessage());
 }
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Events | <?php echo APP_NAME; ?></title>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="assets/css/dashboard.css">
-</head>
-<body>
-
-<div class="dashboard-layout">
-    <?php include __DIR__ . '/includes/dashboard/sidebar.php'; ?>
-    <main class="main-content">
-        <?php include __DIR__ . '/includes/dashboard/topbar.php'; ?>
+<?php 
+$page_title = "My Events";
+require_once __DIR__ . '/includes/dashboard/layout_header.php'; 
+?>
 
         <div class="page-content">
             <div class="page-header">
@@ -79,19 +64,19 @@ try {
                                 <?php foreach($events as $evt): ?>
                                 <tr>
                                     <td>
-                                        <strong style="color: var(--text-dark); display: block;"><?php echo htmlspecialchars($evt['title']); ?></strong>
+                                        <strong style="color: var(--text-dark); display: block;"><?php echo htmlspecialchars($evt['title'] ?? ''); ?></strong>
                                     </td>
                                     <td>
-                                        <span style="font-size: 0.85rem; font-weight: 600; color: var(--primary-dark);"><?php echo htmlspecialchars($evt['coordinator_name']); ?></span>
+                                        <span style="font-size: 0.85rem; font-weight: 600; color: var(--primary-dark);"><?php echo htmlspecialchars($evt['coordinator_name'] ?? ''); ?></span>
                                     </td>
                                     <td>
                                         <div style="font-size: 0.85rem; color: var(--text-dark); font-weight: 600;"><?php echo date('M d, Y', strtotime($evt['event_date'])); ?></div>
-                                        <div style="font-size: 0.75rem; color: var(--text-muted);"><i class="fas fa-map-marker-alt"></i> <?php echo htmlspecialchars($evt['venue']); ?></div>
+                                        <div style="font-size: 0.75rem; color: var(--text-muted);"><i class="fas fa-map-marker-alt"></i> <?php echo htmlspecialchars($evt['venue'] ?? ''); ?></div>
                                     </td>
                                     <td>
                                         <?php 
                                         $attClass = 'status-pending'; // default
-                                        if ($evt['attendance_status'] == 'attended' || $evt['attendance_status'] == 'present') $attClass = 'status-active';
+                                        if ($evt['attendance_status'] == 'attended' || ($evt['attendance_status'] ?? '') == 'present') $attClass = 'status-active';
                                         if ($evt['attendance_status'] == 'absent') $attClass = 'status-inactive';
                                         ?>
                                         <span class="status-badge <?php echo $attClass; ?>"><?php echo ucfirst($evt['attendance_status']); ?></span>
@@ -113,10 +98,5 @@ try {
             </div>
 
         </div>
-    </main>
-</div>
-
-<script src="assets/js/dashboard.js"></script>
-
-</body>
-</html>
+    
+<?php require_once __DIR__ . '/includes/dashboard/layout_footer.php'; ?>

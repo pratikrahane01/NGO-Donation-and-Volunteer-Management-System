@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($action === 'update_user') {
             $user_id = filter_var($_POST['user_id'], FILTER_VALIDATE_INT);
             $role_id = filter_var($_POST['role_id'], FILTER_VALIDATE_INT);
-            $status = htmlspecialchars($_POST['status']);
+            $status = htmlspecialchars($_POST['status'] ?? '');
             
             if ($user_id && $role_id && in_array($status, ['active', 'inactive', 'suspended', 'banned'])) {
                 try {
@@ -131,145 +131,81 @@ try {
 }
 
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Management | <?php echo htmlspecialchars(APP_NAME); ?></title>
-    
-    <!-- Premium Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Dashboard Core CSS -->
-    <link rel="stylesheet" href="assets/css/dashboard.css">
-    
-    <style>
-        .filter-bar {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-        .filter-bar input, .filter-bar select {
-            padding: 10px 15px;
-            border: 1px solid rgba(0,0,0,0.1);
-            border-radius: 8px;
-            font-family: var(--font-body);
-            background: white;
-            min-width: 200px;
-        }
-        .filter-bar input:focus, .filter-bar select:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(124, 154, 134, 0.2);
-        }
-        .pagination {
-            display: flex;
-            justify-content: center;
-            gap: 5px;
-            margin-top: 20px;
-        }
-        .page-btn {
-            padding: 8px 12px;
-            border-radius: 6px;
-            border: 1px solid rgba(0,0,0,0.1);
-            background: white;
-            color: var(--text-dark);
-            text-decoration: none;
-            transition: all 0.2s;
-        }
-        .page-btn.active {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-        }
-        .page-btn:hover:not(.active) {
-            background: rgba(0,0,0,0.02);
-        }
-        
-        /* Modal Styles */
-        .modal {
-            position: fixed;
-            inset: 0;
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(6px);
-            z-index: 1050;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
-        }
-        .modal.active {
-            opacity: 1;
-            visibility: visible;
-        }
-        .modal-content {
-            background: white;
-            padding: 25px;
-            border-radius: 16px;
-            width: 100%;
-            max-width: 500px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            transform: scale(0.95);
-            transition: all 0.3s ease;
-        }
-        .modal.active .modal-content {
-            transform: scale(1);
-        }
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-        }
-        .modal-header h3 {
-            margin: 0;
-            font-size: 1.2rem;
-            color: var(--text-dark);
-        }
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 1.2rem;
-            color: var(--text-muted);
-            cursor: pointer;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            color: var(--text-dark);
-        }
-        .form-group select {
-            width: 100%;
-            padding: 10px 15px;
-            border: 1px solid rgba(0,0,0,0.1);
-            border-radius: 8px;
-            background: white;
-            font-family: var(--font-body);
-        }
-    </style>
-</head>
-<body>
+<?php 
 
-<div class="dashboard-layout">
-    <!-- Sidebar -->
-    <?php include __DIR__ . '/includes/dashboard/sidebar.php'; ?>
+// --- AJAX MODAL HANDLER ---
+if (isset($_GET['modal']) && ($_GET['modal'] ?? '') === 'edit_user') {
+    $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+    
+    $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
+    $stmt->execute([$id]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    if ($user) {
+        $rolesStmt = $pdo->query("SELECT * FROM roles ORDER BY id ASC");
+        $roles = $rolesStmt->fetchAll(PDO::FETCH_ASSOC);
+        ?>
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Edit User Details</h2>
+                <button type="button" class="close-btn" data-modal-close="true"><i class="fas fa-times"></i></button>
+            </div>
+            
+            <form method="POST" action="<?php echo basename(__FILE__); ?>" class="ajax-form">
+                <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token'] ?? ''; ?>">
+                <input type="hidden" name="action" value="update_user">
+                <input type="hidden" name="user_id" value="<?php echo $user['id'] ?? ''; ?>">
+                
+                <div class="modal-body">
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label style="display:block; margin-bottom:5px; color:var(--text-dark); font-weight:600;">User Name</label>
+                        <input type="text" class="form-control" value="<?php echo htmlspecialchars($user['full_name'] ?? ''); ?>" disabled style="width: 100%; padding: 10px; border: 1px solid rgba(0,0,0,0.1); border-radius: 6px; background: rgba(0,0,0,0.02);">
+                    </div>
+                    
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label style="display:block; margin-bottom:5px; color:var(--text-dark); font-weight:600;">Role</label>
+                        <select name="role_id" class="form-control" style="width: 100%; padding: 10px; border: 1px solid rgba(0,0,0,0.1); border-radius: 6px;" <?php echo ($_SESSION['user_id'] ?? '') == $user['id'] ? 'disabled' : ''; ?>>
+                            <?php foreach($roles as $r): ?>
+                                <option value="<?php echo $r['id'] ?? ''; ?>" <?php echo ($user['role_id'] ?? '') == $r['id'] ? 'selected' : ''; ?>>
+                                    <?php echo htmlspecialchars($r['name'] ?? ''); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <?php if($_SESSION['user_id'] == $user['id']): ?>
+                            <input type="hidden" name="role_id" value="<?php echo $user['role_id'] ?? ''; ?>">
+                        <?php endif; ?>
+                    </div>
+                    
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label style="display:block; margin-bottom:5px; color:var(--text-dark); font-weight:600;">Status</label>
+                        <select name="status" class="form-control" style="width: 100%; padding: 10px; border: 1px solid rgba(0,0,0,0.1); border-radius: 6px;" <?php echo ($_SESSION['user_id'] ?? '') == $user['id'] ? 'disabled' : ''; ?>>
+                            <option value="active" <?php echo ($user['status'] ?? '') == 'active' ? 'selected' : ''; ?>>Active</option>
+                            <option value="inactive" <?php echo ($user['status'] ?? '') == 'inactive' ? 'selected' : ''; ?>>Inactive</option>
+                            <option value="suspended" <?php echo ($user['status'] ?? '') == 'suspended' ? 'selected' : ''; ?>>Suspended</option>
+                            <option value="banned" <?php echo ($user['status'] ?? '') == 'banned' ? 'selected' : ''; ?>>Banned</option>
+                        </select>
+                        <?php if($_SESSION['user_id'] == $user['id']): ?>
+                            <input type="hidden" name="status" value="<?php echo $user['status'] ?? ''; ?>">
+                        <?php endif; ?>
+                    </div>
+                </div>
+                
+                <div class="modal-footer" style="padding-top: 15px; display: flex; justify-content: flex-end; gap: 10px;">
+                    <button type="button" class="btn btn-secondary" data-modal-close="true">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+        <?php
+    }
+    exit;
+}
+// --- END AJAX MODAL HANDLER ---
 
-    <main class="main-content">
-        <!-- Topbar -->
-        <?php include __DIR__ . '/includes/dashboard/topbar.php'; ?>
+
+$page_title = "User Management";
+require_once __DIR__ . '/includes/dashboard/layout_header.php'; 
+?>
 
         <div class="page-content">
             <!-- Header Section -->
@@ -299,18 +235,18 @@ try {
             <!-- Filter Bar -->
             <div class="glass-card" style="margin-bottom: 20px;">
                 <form method="GET" action="admin_users.php" class="filter-bar">
-                    <input type="text" name="search" placeholder="Search by name or email..." value="<?php echo htmlspecialchars($search); ?>">
+                    <input class="form-control" type="text" name="search" placeholder="Search by name or email..." value="<?php echo htmlspecialchars($search); ?>">
                     
-                    <select name="role">
+                    <select class="form-control" name="role">
                         <option value="">All Roles</option>
                         <?php foreach($allRoles as $role): ?>
-                            <option value="<?php echo $role['id']; ?>" <?php echo $role_filter == $role['id'] ? 'selected' : ''; ?>>
-                                <?php echo htmlspecialchars($role['name']); ?>
+                            <option value="<?php echo $role['id'] ?? ''; ?>" <?php echo $role_filter == $role['id'] ? 'selected' : ''; ?>>
+                                <?php echo htmlspecialchars($role['name'] ?? ''); ?>
                             </option>
                         <?php endforeach; ?>
                     </select>
 
-                    <select name="status">
+                    <select class="form-control" name="status">
                         <option value="">All Statuses</option>
                         <option value="active" <?php echo $status_filter === 'active' ? 'selected' : ''; ?>>Active</option>
                         <option value="inactive" <?php echo $status_filter === 'inactive' ? 'selected' : ''; ?>>Inactive</option>
@@ -344,14 +280,14 @@ try {
                             <tbody>
                                 <?php foreach($users as $u): ?>
                                 <tr>
-                                    <td>#<?php echo $u['id']; ?></td>
+                                    <td>#<?php echo $u['id'] ?? ''; ?></td>
                                     <td>
-                                        <div style="font-weight: 600; color: var(--text-dark);"><?php echo htmlspecialchars($u['full_name']); ?></div>
+                                        <div style="font-weight: 600; color: var(--text-dark);"><?php echo htmlspecialchars($u['full_name'] ?? ''); ?></div>
                                     </td>
-                                    <td><?php echo htmlspecialchars($u['email']); ?></td>
+                                    <td><?php echo htmlspecialchars($u['email'] ?? ''); ?></td>
                                     <td>
                                         <span class="badge" style="background: rgba(124, 154, 134, 0.1); color: var(--primary);">
-                                            <?php echo htmlspecialchars($u['role_name']); ?>
+                                            <?php echo htmlspecialchars($u['role_name'] ?? ''); ?>
                                         </span>
                                     </td>
                                     <td>
@@ -366,16 +302,16 @@ try {
                                             ];
                                         ?>
                                         <span class="badge" style="background: <?php echo $statusColors[$u['status']]; ?>; color: <?php echo $textColors[$u['status']]; ?>;">
-                                            <?php echo ucfirst(htmlspecialchars($u['status'])); ?>
+                                            <?php echo ucfirst(htmlspecialchars($u['status'] ?? '')); ?>
                                         </span>
                                     </td>
                                     <td><?php echo date('M d, Y', strtotime($u['created_at'])); ?></td>
                                     <td>
                                         <div style="display: flex; gap: 8px;">
-                                            <button onclick='openEditModal(<?php echo json_encode($u); ?>)' class="action-btn" style="width: 32px; height: 32px;" title="Edit Role & Status">
+                                            <button data-ajax-modal="true" data-url="admin_users.php?modal=edit_user&id=<?php echo $u['id'] ?? ''; ?>" class="action-btn" >
                                                 <i class="fas fa-edit"></i>
                                             </button>
-                                            <a href="admin_user_activity.php?id=<?php echo $u['id']; ?>" class="action-btn" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; text-decoration: none;" title="View Activity Logs">
+                                            <a href="admin_user_activity.php?id=<?php echo $u['id'] ?? ''; ?>" class="action-btn" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; text-decoration: none;" title="View Activity Logs">
                                                 <i class="fas fa-history"></i>
                                             </a>
                                         </div>
@@ -401,67 +337,5 @@ try {
             </div>
             
         </div>
-    </main>
-</div>
-
-<!-- Edit User Modal -->
-<div class="modal" id="editUserModal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3>Edit User</h3>
-            <button class="modal-close" onclick="closeEditModal()"><i class="fas fa-times"></i></button>
-        </div>
-        <form method="POST" action="admin_users.php">
-            <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
-            <input type="hidden" name="action" value="update_user">
-            <input type="hidden" name="user_id" id="edit_user_id" value="">
-            
-            <div class="form-group">
-                <label>User Name</label>
-                <input type="text" id="edit_user_name" readonly style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; background: #f9f9f9; font-family: var(--font-body);">
-            </div>
-            
-            <div class="form-group">
-                <label>Role</label>
-                <select name="role_id" id="edit_role_id" required>
-                    <?php foreach($allRoles as $role): ?>
-                        <option value="<?php echo $role['id']; ?>"><?php echo htmlspecialchars($role['name']); ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label>Status</label>
-                <select name="status" id="edit_status" required>
-                    <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
-                    <option value="suspended">Suspended</option>
-                    <option value="banned">Banned</option>
-                </select>
-            </div>
-            
-            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
-                <button type="button" class="btn-primary" style="background: rgba(0,0,0,0.05); color: var(--text-dark);" onclick="closeEditModal()">Cancel</button>
-                <button type="submit" class="btn-primary">Save Changes</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<script src="assets/js/dashboard.js"></script>
-<script>
-    function openEditModal(user) {
-        document.getElementById('edit_user_id').value = user.id;
-        document.getElementById('edit_user_name').value = user.full_name;
-        document.getElementById('edit_role_id').value = user.role_id;
-        document.getElementById('edit_status').value = user.status;
-        
-        document.getElementById('editUserModal').classList.add('active');
-    }
     
-    function closeEditModal() {
-        document.getElementById('editUserModal').classList.remove('active');
-    }
-</script>
-</body>
-</html>
+<?php require_once __DIR__ . '/includes/dashboard/layout_footer.php'; ?>

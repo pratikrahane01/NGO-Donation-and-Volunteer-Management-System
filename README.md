@@ -52,3 +52,25 @@ NGO-Donation-Management-System/
 - Email Notifications
 - Advanced Analytics Dashboard
 - Mobile App API
+
+## System Visuals
+
+### Landing Page
+![Landing Page](screenshots_v2/public_landing.png)
+
+### User Dashboards
+
+**Super Admin Dashboard**
+![Super Admin Dashboard](screenshots_v2/Super_Admin_dashboard_auto.png)
+
+**NGO Admin Dashboard**
+![NGO Admin Dashboard](screenshots_v2/NGO_Admin_ngo_dashboard.png)
+
+**Coordinator Dashboard**
+![Coordinator Dashboard](screenshots_v2/Coordinator_coordinator_dashboard.png)
+
+**Volunteer Dashboard**
+![Volunteer Dashboard](screenshots_v2/Volunteer_volunteer_dashboard.png)
+
+**Donor Dashboard**
+![Donor Dashboard](screenshots_v2/Donor_donor_dashboard.png)

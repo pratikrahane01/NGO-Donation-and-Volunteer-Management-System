@@ -20,31 +20,10 @@ $activeCampaigns = $dashboardData['activeCampaigns'];
 $recentActivity = $dashboardData['recentActivity'];
 $notifications = $dashboardData['notifications'];
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Donor Dashboard | <?php echo APP_NAME; ?></title>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-    
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <link rel="stylesheet" href="assets/css/dashboard.css">
-</head>
-<body>
-
-<div class="dashboard-layout">
-    <!-- Sidebar -->
-    <?php include __DIR__ . '/includes/dashboard/sidebar.php'; ?>
-
-    <!-- Main Content -->
-    <main class="main-content">
-        <!-- Topbar -->
-        <?php include __DIR__ . '/includes/dashboard/topbar.php'; ?>
+<?php 
+$page_title = "Donor Dashboard";
+require_once __DIR__ . '/includes/dashboard/layout_header.php'; 
+?>
 
         <div class="page-content">
             
@@ -83,12 +62,12 @@ $notifications = $dashboardData['notifications'];
                         <div class="activity-timeline">
                             <?php foreach($recentActivity as $activity): ?>
                                 <div class="timeline-item" style="display: flex; gap: 15px; margin-bottom: 20px;">
-                                    <div class="timeline-icon" style="width: 40px; height: 40px; border-radius: 50%; background: <?php echo $activity['color']; ?>20; color: <?php echo $activity['color']; ?>; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1.2rem;">
-                                        <i class="<?php echo $activity['icon']; ?>"></i>
+                                    <div class="timeline-icon" style="width: 40px; height: 40px; border-radius: 50%; background: <?php echo $activity['color'] ?? ''; ?>20; color: <?php echo $activity['color'] ?? ''; ?>; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1.2rem;">
+                                        <i class="<?php echo $activity['icon'] ?? ''; ?>"></i>
                                     </div>
                                     <div class="timeline-content">
-                                        <strong style="color: var(--text-dark); display: block; font-size: 0.95rem;"><?php echo htmlspecialchars($activity['description']); ?></strong>
-                                        <span style="font-size: 0.85rem; color: var(--text-body);"><?php echo htmlspecialchars($activity['title']); ?></span>
+                                        <strong style="color: var(--text-dark); display: block; font-size: 0.95rem;"><?php echo htmlspecialchars($activity['description'] ?? ''); ?></strong>
+                                        <span style="font-size: 0.85rem; color: var(--text-body);"><?php echo htmlspecialchars($activity['title'] ?? ''); ?></span>
                                         <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;"><i class="far fa-clock"></i> <?php echo date('M d, g:i A', strtotime($activity['event_date'])); ?></div>
                                     </div>
                                 </div>
@@ -126,10 +105,10 @@ $notifications = $dashboardData['notifications'];
                                     ?>
                                     <tr>
                                         <td>
-                                            <a href="donor_campaign_details.php?id=<?php echo $camp['id']; ?>" style="text-decoration: none;">
-                                                <strong style="color: var(--text-dark); display: block;"><?php echo htmlspecialchars($camp['name']); ?></strong>
+                                            <a href="donor_campaign_details.php?id=<?php echo $camp['id'] ?? ''; ?>" style="text-decoration: none;">
+                                                <strong style="color: var(--text-dark); display: block;"><?php echo htmlspecialchars($camp['name'] ?? ''); ?></strong>
                                             </a>
-                                            <span style="font-size: 0.8rem; color: var(--text-muted);"><i class="fas <?php echo htmlspecialchars($camp['category_icon']); ?>"></i> <?php echo htmlspecialchars($camp['category_name']); ?></span>
+                                            <span style="font-size: 0.8rem; color: var(--text-muted);"><i class="fas <?php echo htmlspecialchars($camp['category_icon'] ?? ''); ?>"></i> <?php echo htmlspecialchars($camp['category_name'] ?? ''); ?></span>
                                         </td>
                                         <td><strong style="color: var(--primary);"><?php echo formatIndianCurrency($camp['target_amount']); ?></strong></td>
                                         <td>
@@ -139,7 +118,7 @@ $notifications = $dashboardData['notifications'];
                                             <span style="font-size: 0.75rem; color: var(--text-muted);"><?php echo number_format($percent, 1); ?>% funded</span>
                                         </td>
                                         <td>
-                                            <a href="donor_donate.php?campaign_id=<?php echo $camp['id']; ?>" class="btn-primary" style="padding: 5px 12px; font-size: 0.8rem; text-decoration: none;">Donate</a>
+                                            <a href="donor_donate.php?campaign_id=<?php echo $camp['id'] ?? ''; ?>" class="btn-primary" style="padding: 5px 12px; font-size: 0.8rem; text-decoration: none;">Donate</a>
                                         </td>
                                     </tr>
                                     <?php endforeach; ?>
@@ -169,8 +148,8 @@ $notifications = $dashboardData['notifications'];
                                             <i class="fas fa-bell"></i>
                                         </div>
                                         <div>
-                                            <strong style="color: var(--text-dark); display: block; font-size: 0.95rem;"><?php echo htmlspecialchars($notif['title']); ?></strong>
-                                            <p style="font-size: 0.85rem; color: var(--text-body); margin: 4px 0;"><?php echo htmlspecialchars($notif['message']); ?></p>
+                                            <strong style="color: var(--text-dark); display: block; font-size: 0.95rem;"><?php echo htmlspecialchars($notif['title'] ?? ''); ?></strong>
+                                            <p style="font-size: 0.85rem; color: var(--text-body); margin: 4px 0;"><?php echo htmlspecialchars($notif['message'] ?? ''); ?></p>
                                             <span style="font-size: 0.75rem; color: var(--text-muted);"><i class="far fa-clock"></i> <?php echo date('M d, g:i A', strtotime($notif['created_at'])); ?></span>
                                         </div>
                                     </a>
@@ -182,9 +161,5 @@ $notifications = $dashboardData['notifications'];
             </div>
 
         </div>
-    </main>
-</div>
-
-<script src="assets/js/dashboard.js"></script>
-</body>
-</html>
+    
+<?php require_once __DIR__ . '/includes/dashboard/layout_footer.php'; ?>

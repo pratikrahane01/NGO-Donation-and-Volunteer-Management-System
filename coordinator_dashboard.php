@@ -18,32 +18,10 @@ $upcoming_events = get_coordinator_upcoming_events($pdo, $coordinator_id, 5);
 $recent_activity = get_coordinator_recent_activity($pdo, $coordinator_id, 5);
 
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Event Coordinator Dashboard | <?php echo htmlspecialchars(APP_NAME); ?></title>
-    
-    <!-- Premium Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
-    <!-- Dashboard Core CSS -->
-    <link rel="stylesheet" href="assets/css/dashboard.css">
-</head>
-<body>
-
-<div class="dashboard-layout">
-    <!-- Sidebar -->
-    <?php include __DIR__ . '/includes/dashboard/sidebar.php'; ?>
-
-    <main class="main-content">
-        <!-- Topbar -->
-        <?php include __DIR__ . '/includes/dashboard/topbar.php'; ?>
+<?php 
+$page_title = "Event Coordinator Dashboard";
+require_once __DIR__ . '/includes/dashboard/layout_header.php'; 
+?>
 
         <div class="page-content">
             <!-- Header Section -->
@@ -115,10 +93,10 @@ $recent_activity = get_coordinator_recent_activity($pdo, $coordinator_id, 5);
                                             <i class="far fa-clock"></i> <?php echo date('M d, g:i A', strtotime($log['date'])); ?>
                                         </div>
                                         <div style="font-weight: 500; color: var(--text-dark); margin-bottom: 3px;">
-                                            <?php echo htmlspecialchars($log['description']); ?>
+                                            <?php echo htmlspecialchars($log['description'] ?? ''); ?>
                                         </div>
                                         <div style="font-size: 0.85rem; color: var(--primary);">
-                                            <?php echo htmlspecialchars($log['title']); ?>
+                                            <?php echo htmlspecialchars($log['title'] ?? ''); ?>
                                         </div>
                                     </li>
                                 <?php endforeach; ?>
@@ -153,7 +131,7 @@ $recent_activity = get_coordinator_recent_activity($pdo, $coordinator_id, 5);
                                 <?php foreach ($upcoming_events as $event): ?>
                                 <tr>
                                     <td>
-                                        <div style="font-weight: 600; color: var(--text-dark);"><?php echo htmlspecialchars($event['title']); ?></div>
+                                        <div style="font-weight: 600; color: var(--text-dark);"><?php echo htmlspecialchars($event['title'] ?? ''); ?></div>
                                     </td>
                                     <td><?php echo date('M d, Y', strtotime($event['date'])); ?></td>
                                     <td><?php echo htmlspecialchars($event['location'] ?? 'N/A'); ?></td>
@@ -170,9 +148,5 @@ $recent_activity = get_coordinator_recent_activity($pdo, $coordinator_id, 5);
             </div>
             
         </div>
-    </main>
-</div>
-
-<script src="assets/js/dashboard.js"></script>
-</body>
-</html>
+    
+<?php require_once __DIR__ . '/includes/dashboard/layout_footer.php'; ?>

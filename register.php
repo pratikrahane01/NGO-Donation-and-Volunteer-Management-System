@@ -88,7 +88,7 @@ $csrfToken = Security::generateCSRF();
 
             <?php if (is_array($result) && isset($result['success'])): ?>
                 <div class="alert-message alert-success">
-                    <i class="fas fa-check-circle" style="margin-right: 8px;"></i> <?php echo htmlspecialchars($result['message']); ?>
+                    <i class="fas fa-check-circle" style="margin-right: 8px;"></i> <?php echo htmlspecialchars($result['message'] ?? ''); ?>
                     <div style="margin-top: 15px; width: 100%;">
                         <a href="login.php" class="btn-auth" style="text-align: center; display: block; text-decoration: none; padding: 12px;">Proceed to Login</a>
                     </div>
@@ -148,7 +148,7 @@ $csrfToken = Security::generateCSRF();
                 </div>
                 
                 <div class="btn-wrapper">
-                    <button type="submit" class="btn-auth">Create Account</button>
+                    <button type="submit" class="btn btn-primary">Create Account</button>
                 </div>
             </form>
             <?php endif; ?>

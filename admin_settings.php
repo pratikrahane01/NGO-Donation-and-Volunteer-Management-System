@@ -70,142 +70,10 @@ try {
 }
 
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>System Settings | <?php echo htmlspecialchars(APP_NAME); ?></title>
-    
-    <!-- Premium Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Dashboard Core CSS -->
-    <link rel="stylesheet" href="assets/css/dashboard.css">
-    
-    <style>
-        .settings-layout {
-            display: grid;
-            grid-template-columns: 250px 1fr;
-            gap: 30px;
-        }
-        @media (max-width: 992px) {
-            .settings-layout {
-                grid-template-columns: 1fr;
-            }
-        }
-        
-        .settings-nav {
-            background: white;
-            border-radius: 16px;
-            padding: 20px 0;
-            border: 1px solid rgba(0,0,0,0.05);
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
-            align-self: start;
-        }
-        .settings-nav-item {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 12px 25px;
-            color: var(--text-muted);
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.2s;
-            border-left: 3px solid transparent;
-        }
-        .settings-nav-item:hover {
-            background: rgba(0,0,0,0.02);
-            color: var(--text-dark);
-        }
-        .settings-nav-item.active {
-            color: var(--primary);
-            background: rgba(124, 154, 134, 0.05);
-            border-left-color: var(--primary);
-        }
-        
-        .settings-card {
-            background: white;
-            border-radius: 16px;
-            border: 1px solid rgba(0,0,0,0.05);
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
-            overflow: hidden;
-        }
-        .settings-header {
-            padding: 25px 30px;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-        }
-        .settings-header h3 {
-            margin: 0;
-            font-size: 1.2rem;
-            color: var(--text-dark);
-        }
-        .settings-header p {
-            margin: 5px 0 0 0;
-            color: var(--text-muted);
-            font-size: 0.9rem;
-        }
-        .settings-body {
-            padding: 30px;
-        }
-        
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-        @media (max-width: 768px) {
-            .form-grid { grid-template-columns: 1fr; }
-        }
-        .form-group.full-width {
-            grid-column: 1 / -1;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: var(--text-dark);
-            font-size: 0.9rem;
-        }
-        .form-group input, .form-group textarea {
-            width: 100%;
-            padding: 12px 15px;
-            border: 1px solid rgba(0,0,0,0.1);
-            border-radius: 8px;
-            font-family: var(--font-body);
-            background: #f9f9f9;
-            transition: all 0.2s;
-        }
-        .form-group input:focus, .form-group textarea:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(124, 154, 134, 0.2);
-            background: white;
-        }
-        .form-group textarea {
-            resize: vertical;
-            min-height: 100px;
-        }
-        
-        .settings-footer {
-            padding: 20px 30px;
-            background: #fafafa;
-            border-top: 1px solid rgba(0,0,0,0.05);
-            display: flex;
-            justify-content: flex-end;
-        }
-    </style>
-</head>
-<body>
-
-<div class="dashboard-layout">
-    <!-- Sidebar -->
-    <?php include __DIR__ . '/includes/dashboard/sidebar.php'; ?>
-
-    <main class="main-content">
-        <!-- Topbar -->
-        <?php include __DIR__ . '/includes/dashboard/topbar.php'; ?>
+<?php 
+$page_title = "System Settings";
+require_once __DIR__ . '/includes/dashboard/layout_header.php'; 
+?>
 
         <div class="page-content">
             <!-- Header Section -->
@@ -238,15 +106,6 @@ try {
                     <a href="admin_settings.php" class="settings-nav-item active">
                         <i class="fas fa-building"></i> Organization Profile
                     </a>
-                    <a href="#" class="settings-nav-item" onclick="alert('Coming soon: Payment Gateway configurations.')">
-                        <i class="fas fa-credit-card"></i> Payment Settings
-                    </a>
-                    <a href="#" class="settings-nav-item" onclick="alert('Coming soon: Email SMTP configurations.')">
-                        <i class="fas fa-envelope"></i> Email Integrations
-                    </a>
-                    <a href="#" class="settings-nav-item" onclick="alert('Coming soon: Platform configuration.')">
-                        <i class="fas fa-sliders-h"></i> Platform Preferences
-                    </a>
                 </div>
 
                 <!-- Content -->
@@ -257,49 +116,49 @@ try {
                     </div>
                     
                     <form method="POST" action="admin_settings.php">
-                        <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+                        <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token'] ?? ''; ?>">
                         <input type="hidden" name="action" value="update_profile">
                         
                         <div class="settings-body">
                             <div class="form-grid">
                                 <div class="form-group full-width">
                                     <label>Organization Name *</label>
-                                    <input type="text" name="ngo_name" value="<?php echo htmlspecialchars($settings['ngo_name'] ?? ''); ?>" required>
+                                    <input class="form-control" type="text" name="ngo_name" value="<?php echo htmlspecialchars($settings['ngo_name'] ?? ''); ?>" required>
                                 </div>
                                 
                                 <div class="form-group">
                                     <label>Contact Email *</label>
-                                    <input type="email" name="email" value="<?php echo htmlspecialchars($settings['email'] ?? ''); ?>" required>
+                                    <input class="form-control" type="email" name="email" value="<?php echo htmlspecialchars($settings['email'] ?? ''); ?>" required>
                                 </div>
                                 
                                 <div class="form-group">
                                     <label>Phone Number</label>
-                                    <input type="text" name="phone" value="<?php echo htmlspecialchars($settings['phone'] ?? ''); ?>">
+                                    <input class="form-control" type="text" name="phone" value="<?php echo htmlspecialchars($settings['phone'] ?? ''); ?>">
                                 </div>
                                 
                                 <div class="form-group full-width">
                                     <label>Website URL</label>
-                                    <input type="url" name="website" value="<?php echo htmlspecialchars($settings['website'] ?? ''); ?>">
+                                    <input class="form-control" type="url" name="website" value="<?php echo htmlspecialchars($settings['website'] ?? ''); ?>">
                                 </div>
                                 
                                 <div class="form-group full-width">
                                     <label>Office Address</label>
-                                    <textarea name="address"><?php echo htmlspecialchars($settings['address'] ?? ''); ?></textarea>
+                                    <textarea class="form-control" name="address"><?php echo htmlspecialchars($settings['address'] ?? ''); ?></textarea>
                                 </div>
                                 
                                 <div class="form-group full-width">
                                     <label>Mission Statement</label>
-                                    <textarea name="mission"><?php echo htmlspecialchars($settings['mission'] ?? ''); ?></textarea>
+                                    <textarea class="form-control" name="mission"><?php echo htmlspecialchars($settings['mission'] ?? ''); ?></textarea>
                                 </div>
                                 
                                 <div class="form-group full-width">
                                     <label>Vision Statement</label>
-                                    <textarea name="vision"><?php echo htmlspecialchars($settings['vision'] ?? ''); ?></textarea>
+                                    <textarea class="form-control" name="vision"><?php echo htmlspecialchars($settings['vision'] ?? ''); ?></textarea>
                                 </div>
                                 
                                 <div class="form-group full-width">
                                     <label>Social Media Links</label>
-                                    <textarea name="social_media_links" placeholder="E.g., Facebook: https://..., Twitter: https://..."><?php echo htmlspecialchars($settings['social_media_links'] ?? ''); ?></textarea>
+                                    <textarea class="form-control" name="social_media_links" placeholder="E.g., Facebook: https://..., Twitter: https://..."><?php echo htmlspecialchars($settings['social_media_links'] ?? ''); ?></textarea>
                                 </div>
                             </div>
                         </div>
@@ -314,9 +173,5 @@ try {
             </div>
             
         </div>
-    </main>
-</div>
-
-<script src="assets/js/dashboard.js"></script>
-</body>
-</html>
+    
+<?php require_once __DIR__ . '/includes/dashboard/layout_footer.php'; ?>

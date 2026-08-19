@@ -7,10 +7,11 @@
             <i class="fas fa-bars"></i>
         </button>
         
-        <form action="admin_search.php" method="GET" class="search-bar" style="margin: 0; padding: 0; border: none; background: transparent;">
+        <form action="admin_search.php" method="GET" class="search-form-container">
             <div class="search-bar">
-                <i class="fas fa-search"></i>
-                <input type="text" name="q" placeholder="Search campaigns, donors...">
+                <input type="text" name="q" id="global-search-input" placeholder="Search campaigns, volunteers, donors...">
+                <i class="fas fa-search search-icon"></i>
+                <span class="shortcut-hint">/</span>
             </div>
         </form>
     </div>
@@ -55,8 +56,8 @@
                                 <i class="fas fa-bell"></i>
                             </div>
                             <div style="line-height: 1.3;">
-                                <span style="font-size: 0.85rem; font-weight: 600; display: block; color: var(--text-dark);"><?php echo htmlspecialchars($notif['title']); ?></span>
-                                <span style="font-size: 0.75rem; color: var(--text-muted);"><?php echo htmlspecialchars($notif['message']); ?></span>
+                                <span style="font-size: 0.85rem; font-weight: 600; display: block; color: var(--text-dark);"><?php echo htmlspecialchars($notif['title'] ?? ''); ?></span>
+                                <span style="font-size: 0.75rem; color: var(--text-muted);"><?php echo htmlspecialchars($notif['message'] ?? ''); ?></span>
                             </div>
                         </a>
                     <?php endforeach; ?>
@@ -67,7 +68,7 @@
             </div>
         </div>
         
-        <?php if ($_SESSION['role_id'] == 1 || $_SESSION['role_id'] == 2): ?>
+        <?php if ($_SESSION['role_id'] == 1 || ($_SESSION['role_id'] ?? '') == 2): ?>
         <a href="<?php echo ($role_id == 2) ? 'ngo' : 'admin'; ?>_inquiries.php" class="action-btn" style="text-decoration: none; color: inherit;">
             <i class="fas fa-envelope"></i>
         </a>
@@ -91,7 +92,7 @@
                 <?php elseif ($_SESSION['role_id'] == 5): ?>
                     <a href="coordinator_profile.php" class="dropdown-item"><i class="fas fa-user-circle"></i> My Profile</a>
                 <?php endif; ?>
-                <a href="#" class="dropdown-item"><i class="fas fa-cog"></i> Preferences</a>
+                <a href="javascript:void(0)" class="dropdown-item"><i class="fas fa-cog"></i> Preferences</a>
                 <div style="height: 1px; background: rgba(0,0,0,0.05); margin: 5px 0;"></div>
                 <a href="logout.php" class="dropdown-item" style="color: var(--danger);"><i class="fas fa-sign-out-alt"></i> Logout</a>
             </div>

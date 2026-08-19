@@ -782,7 +782,7 @@ class Requests {
 
 		$options['hooks']->dispatch('requests.before_redirect_check', [&$return, $req_headers, $req_data, $options]);
 
-		if ($return->is_redirect() && $options['follow_redirects'] === true) {
+		if ($return->is_redirect() && ($options['follow_redirects'] ?? '') === true) {
 			if (isset($return->headers['location']) && $options['redirected'] < $options['redirects']) {
 				if ($return->status_code === 303) {
 					$options['type'] = self::GET;

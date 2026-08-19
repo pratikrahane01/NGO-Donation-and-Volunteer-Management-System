@@ -119,7 +119,7 @@ final class Fsockopen implements Transport {
 			// phpcs:ignore PHPCompatibility.Constants.NewConstants.openssl_tlsext_server_nameFound
 			if (defined('OPENSSL_TLSEXT_SERVER_NAME') && OPENSSL_TLSEXT_SERVER_NAME) {
 				$context_options['SNI_enabled'] = true;
-				if (isset($options['verifyname']) && $options['verifyname'] === false) {
+				if (isset($options['verifyname']) && ($options['verifyname'] ?? '') === false) {
 					$context_options['SNI_enabled'] = false;
 				}
 			}
@@ -134,7 +134,7 @@ final class Fsockopen implements Transport {
 				}
 			}
 
-			if (isset($options['verifyname']) && $options['verifyname'] === false) {
+			if (isset($options['verifyname']) && ($options['verifyname'] ?? '') === false) {
 				$context_options['verify_peer_name'] = false;
 				$verifyname                          = false;
 			}
@@ -197,7 +197,7 @@ final class Fsockopen implements Transport {
 
 			// Always include Content-length on POST requests to prevent
 			// 411 errors from some servers when the body is empty.
-			if (!empty($data) || $options['type'] === Requests::POST) {
+			if (!empty($data) || ($options['type'] ?? '') === Requests::POST) {
 				if (!isset($case_insensitive_headers['Content-Length'])) {
 					$headers['Content-Length'] = strlen($request_body);
 				}
@@ -212,7 +212,7 @@ final class Fsockopen implements Transport {
 			$out         .= sprintf('Host: %s', $url_parts['host']);
 			$scheme_lower = strtolower($url_parts['scheme']);
 
-			if (($scheme_lower === 'http' && $url_parts['port'] !== Port::HTTP) || ($scheme_lower === 'https' && $url_parts['port'] !== Port::HTTPS)) {
+			if (($scheme_lower === 'http' && ($url_parts['port'] ?? '') !== Port::HTTP) || ($scheme_lower === 'https' && ($url_parts['port'] ?? '') !== Port::HTTPS)) {
 				$out .= ':' . $url_parts['port'];
 			}
 

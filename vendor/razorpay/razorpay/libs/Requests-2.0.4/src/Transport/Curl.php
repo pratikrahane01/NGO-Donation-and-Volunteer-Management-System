@@ -197,7 +197,7 @@ final class Curl implements Transport {
 			}
 		}
 
-		if (isset($options['verifyname']) && $options['verifyname'] === false) {
+		if (isset($options['verifyname']) && ($options['verifyname'] ?? '') === false) {
 			curl_setopt($this->handle, CURLOPT_SSL_VERIFYHOST, 0);
 		}
 
@@ -378,7 +378,7 @@ final class Curl implements Transport {
 		 *
 		 * https://curl.se/mail/lib-2017-07/0013.html
 		 */
-		if (!isset($headers['Expect']) && $options['protocol_version'] === 1.1) {
+		if (!isset($headers['Expect']) && ($options['protocol_version'] ?? '') === 1.1) {
 			$headers['Expect'] = $this->get_expect_header($data);
 		}
 

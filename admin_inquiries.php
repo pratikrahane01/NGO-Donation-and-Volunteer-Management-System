@@ -108,32 +108,103 @@ try {
 } catch (PDOException $e) {
     die("Database Error: " . $e->getMessage());
 }
-?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact Inquiries | <?php echo htmlspecialchars(APP_NAME); ?></title>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="assets/css/dashboard.css">
-    <style>
-        .inquiry-subject {
-            max-width: 300px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            display: inline-block;
-        }
-    </style>
-</head>
-<body>
 
-<div class="dashboard-layout">
-    <?php include __DIR__ . '/includes/dashboard/sidebar.php'; ?>
-    <main class="main-content">
-        <?php include __DIR__ . '/includes/dashboard/topbar.php'; ?>
+
+// --- AJAX MODAL HANDLER ---
+if (isset($_GET['modal']) && ($_GET['modal'] ?? '') === 'inquiry_reply') {
+    $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+    
+    $stmt = $pdo->prepare("SELECT * FROM contact_inquiries WHERE inquiry_id = ?");
+    $stmt->execute([$id]);
+    $inq = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    if ($inq) {
+        // Mark as read when opened
+        if ($inq['status'] === 'new') {
+            $update = $pdo->prepare("UPDATE contact_inquiries SET status = 'read' WHERE inquiry_id = ?");
+            $update->execute([$id]);
+            $inq['status'] = 'read';
+        }
+        ?>
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Inquiry Details</h2>
+                <button type="button" class="close-btn" data-modal-close="true"><i class="fas fa-times"></i></button>
+            </div>
+            
+            <div class="modal-body">
+                <div style="background: rgba(0,0,0,0.02); padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <div>
+                            <strong style="color: var(--text-dark);"><?php echo htmlspecialchars($inq['name'] ?? ''); ?></strong>
+                            <div style="font-size: 0.85rem; color: var(--text-muted);"><i class="fas fa-envelope"></i> <?php echo htmlspecialchars($inq['email'] ?? ''); ?></div>
+                        </div>
+                        <div style="text-align: right;">
+                            <span class="badge" style="background: rgba(0,0,0,0.05); color: var(--text-dark);"><?php echo ucfirst(htmlspecialchars($inq['status'] ?? '')); ?></span>
+                            <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 5px;"><?php echo date('M d, Y h:i A', strtotime($inq['submitted_at'])); ?></div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 15px;">
+                        <strong style="display: block; margin-bottom: 5px; color: var(--text-dark);">Subject: <?php echo htmlspecialchars($inq['subject'] ?? ''); ?></strong>
+                        <p style="color: var(--text-muted); line-height: 1.5; white-space: pre-wrap;"><?php echo htmlspecialchars($inq['message'] ?? ''); ?></p>
+                    </div>
+                </div>
+
+                <form method="POST" action="<?php echo basename(__FILE__); ?>" class="ajax-form">
+                    <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token'] ?? ''; ?>">
+                    <input type="hidden" name="action" value="reply_inquiry">
+                    <input type="hidden" name="inquiry_id" value="<?php echo $inq['inquiry_id'] ?? ''; ?>">
+                    
+                    <div class="form-group">
+                        <label>Send Reply</label>
+                        <textarea class="form-control" name="reply_message" rows="4" required placeholder="Type your response here..."></textarea>
+                    </div>
+                    
+                    <div class="modal-footer" style="padding-top: 15px; display: flex; justify-content: space-between; align-items: center;">
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--text-muted); font-size: 0.9rem;">
+                            <input type="checkbox" name="mark_resolved" value="1" style="width: 16px; height: 16px;"> Mark as resolved
+                        </label>
+                        <div style="display: flex; gap: 10px;">
+                            <button type="button" class="btn-secondary" data-modal-close="true">Close</button>
+                            <button type="submit" class="btn-primary"><i class="fas fa-paper-plane"></i> Send Reply</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <?php
+    }
+    exit;
+}
+// --- END AJAX MODAL HANDLER ---
+
+?>
+<?php 
+
+// --- AJAX MODAL POST HANDLER ---
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && ($_POST['action'] ?? '') === 'update_inquiry') {
+    if (isset($_POST['csrf_token']) && hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
+        $id = filter_var($_POST['id'], FILTER_VALIDATE_INT);
+        $status = $_POST['status'];
+        $priority = $_POST['priority'];
+        $internal_notes = htmlspecialchars(trim($_POST['internal_notes']));
+        
+        try {
+            $stmt = $pdo->prepare("UPDATE contact_inquiries SET status = ?, priority = ?, internal_notes = ? WHERE inquiry_id = ?");
+            $stmt->execute([$status, $priority, $internal_notes, $id]);
+            // If ajax, this will just reload the page/table via the JS handler
+        } catch (PDOException $e) {
+            // handle error
+        }
+    }
+}
+// -------------------------------
+
+
+$page_title = "Contact Inquiries";
+
+require_once __DIR__ . '/includes/dashboard/layout_header.php'; 
+?>
 
         <div class="page-content">
             <div class="page-header">
@@ -218,25 +289,25 @@ try {
                                 ?>
                                 <tr>
                                     <td><strong><?php echo htmlspecialchars($inquiry['first_name'] . ' ' . $inquiry['last_name']); ?></strong></td>
-                                    <td><?php echo htmlspecialchars($inquiry['email']); ?></td>
+                                    <td><?php echo htmlspecialchars($inquiry['email'] ?? ''); ?></td>
                                     <td><span class="inquiry-subject"><?php echo htmlspecialchars($subject); ?></span></td>
                                     <td><?php echo date('M d, Y h:i A', strtotime($inquiry['submitted_at'])); ?></td>
                                     <td>
-                                        <span class="status-badge status-<?php echo $inquiry['status'] == 'resolved' ? 'active' : ($inquiry['status'] == 'read' ? 'info' : 'pending'); ?>">
+                                        <span class="status-badge status-<?php echo ($inquiry['status'] ?? '') == 'resolved' ? 'active' : ($inquiry['status'] == 'read' ? 'info' : 'pending'); ?>">
                                             <?php echo ucfirst($inquiry['status']); ?>
                                         </span>
                                     </td>
                                     <td>
-                                        <span class="status-badge" style="background: <?php echo $inquiry['priority'] == 'high' ? 'rgba(220,38,38,0.1)' : ($inquiry['priority'] == 'medium' ? 'rgba(245,158,11,0.1)' : 'rgba(59,130,246,0.1)'); ?>; color: <?php echo $inquiry['priority'] == 'high' ? '#DC2626' : ($inquiry['priority'] == 'medium' ? '#F59E0B' : '#3B82F6'); ?>;">
+                                        <span class="status-badge" style="background: <?php echo ($inquiry['priority'] ?? '') == 'high' ? 'rgba(220,38,38,0.1)' : ($inquiry['priority'] == 'medium' ? 'rgba(245,158,11,0.1)' : 'rgba(59,130,246,0.1)'); ?>; color: <?php echo ($inquiry['priority'] ?? '') == 'high' ? '#DC2626' : ($inquiry['priority'] == 'medium' ? '#F59E0B' : '#3B82F6'); ?>;">
                                             <?php echo ucfirst($inquiry['priority']); ?>
                                         </span>
                                     </td>
                                     <td>
-                                        <a href="<?php echo $prefix; ?>_inquiry_detail.php?id=<?php echo $inquiry['inquiry_id']; ?>" class="action-btn view-btn" title="View Detail"><i class="fas fa-eye"></i></a>
+                                        <button data-ajax-modal="true" data-url="<?php echo basename(__FILE__); ?>?modal=inquiry_details&id=<?php echo $inquiry['inquiry_id'] ?? ''; ?>" class="action-btn view-btn" title="View Detail"><i class="fas fa-eye"></i></button>
                                         <form method="POST" style="display:inline-block;" onsubmit="return confirm('Delete this inquiry?');">
-                                            <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+                                            <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token'] ?? ''; ?>">
                                             <input type="hidden" name="action" value="delete">
-                                            <input type="hidden" name="id" value="<?php echo $inquiry['inquiry_id']; ?>">
+                                            <input type="hidden" name="id" value="<?php echo $inquiry['inquiry_id'] ?? ''; ?>">
                                             <button type="submit" class="action-btn delete-btn" title="Delete"><i class="fas fa-trash"></i></button>
                                         </form>
                                     </td>
@@ -258,7 +329,7 @@ try {
                                 <a href="?page=<?php echo $i; ?>&search=<?php echo urlencode($search); ?>&status=<?php echo urlencode($status_filter); ?>&date_filter=<?php echo urlencode($date_filter); ?>" 
                                    class="btn-primary" style="padding: 5px 12px; font-size: 0.85rem; <?php echo $page == $i ? '' : 'background: rgba(0,0,0,0.05); color: var(--text-dark); border: none;'; ?>">
                                     <?php echo $i; ?>
-                                </a>
+                                </button>
                             <?php endfor; ?>
                         </div>
                     </div>
@@ -266,9 +337,5 @@ try {
             </div>
 
         </div>
-    </main>
-</div>
-
-<script src="assets/js/dashboard.js"></script>
-</body>
-</html>
+    
+<?php require_once __DIR__ . '/includes/dashboard/layout_footer.php'; ?>

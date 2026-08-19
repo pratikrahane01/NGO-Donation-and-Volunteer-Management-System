@@ -143,179 +143,126 @@ try {
     $totalPages = 1;
 }
 
+
+
+// --- AJAX MODAL HANDLER ---
+if (isset($_GET['modal']) && ($_GET['modal'] ?? '') === 'event_form') {
+    $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+    $event = null;
+    
+    if ($id > 0) {
+        $stmt = $pdo->prepare("SELECT * FROM events WHERE id = ?");
+        $stmt->execute([$id]);
+        $event = $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+    
+    ?>
+    <div class="modal">
+        <div class="modal-header">
+            <h2><?php echo $event ? 'Edit Event' : 'Create Event'; ?></h2>
+            <button type="button" class="close-btn" data-modal-close="true"><i class="fas fa-times"></i></button>
+        </div>
+        <form method="POST" action="<?php echo basename(__FILE__); ?>" class="ajax-form">
+            <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token'] ?? ''; ?>">
+            <input type="hidden" name="action" value="<?php echo $event ? 'edit_event' : 'create_event'; ?>">
+            <?php if($event): ?>
+            <input type="hidden" name="id" value="<?php echo $event['id'] ?? ''; ?>">
+            <?php endif; ?>
+            
+            <div class="modal-body">
+                <div class="form-group full-width" style="margin-bottom: 15px;">
+                    <label style="display:block; margin-bottom:5px; color:var(--text-dark); font-weight:600;">Event Title *</label>
+                    <input class="form-control" type="text" name="title" value="<?php echo $event ? htmlspecialchars($event['title'] ?? '') : ''; ?>" required placeholder="e.g., Annual Beach Cleanup" style="width: 100%; padding: 8px; border: 1px solid rgba(0,0,0,0.1); border-radius: 4px;">
+                </div>
+                
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label style="display:block; margin-bottom:5px; color:var(--text-dark); font-weight:600;">Event Type</label>
+                    <input class="form-control" type="text" name="event_type" value="<?php echo $event ? htmlspecialchars($event['event_type'] ?? '') : ''; ?>" placeholder="e.g., Cleanup, Fundraiser" style="width: 100%; padding: 8px; border: 1px solid rgba(0,0,0,0.1); border-radius: 4px;">
+                </div>
+                
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label style="display:block; margin-bottom:5px; color:var(--text-dark); font-weight:600;">Venue *</label>
+                    <input class="form-control" type="text" name="venue" value="<?php echo $event ? htmlspecialchars($event['venue'] ?? '') : ''; ?>" required placeholder="Event location" style="width: 100%; padding: 8px; border: 1px solid rgba(0,0,0,0.1); border-radius: 4px;">
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                    <div class="form-group">
+                        <label style="display:block; margin-bottom:5px; color:var(--text-dark); font-weight:600;">Date *</label>
+                        <input class="form-control" type="date" name="event_date" value="<?php echo $event ? $event['event_date'] : ''; ?>" required style="width: 100%; padding: 8px; border: 1px solid rgba(0,0,0,0.1); border-radius: 4px;">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label style="display:block; margin-bottom:5px; color:var(--text-dark); font-weight:600;">Time *</label>
+                        <input type="time" name="event_time" value="<?php echo $event ? $event['event_time'] : ''; ?>" required style="width: 100%; padding: 8px; border: 1px solid rgba(0,0,0,0.1); border-radius: 4px;">
+                    </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                    <div class="form-group">
+                        <label style="display:block; margin-bottom:5px; color:var(--text-dark); font-weight:600;">Max Volunteers</label>
+                        <input class="form-control" type="number" name="max_volunteers" min="1" value="<?php echo $event ? ($event['max_volunteers'] == 0 ? '' : $event['max_volunteers']) : ''; ?>" placeholder="Leave empty for unlimited" style="width: 100%; padding: 8px; border: 1px solid rgba(0,0,0,0.1); border-radius: 4px;">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label style="display:block; margin-bottom:5px; color:var(--text-dark); font-weight:600;">Coordinator</label>
+                        <select class="form-control" name="coordinator_id" style="width: 100%; padding: 8px; border: 1px solid rgba(0,0,0,0.1); border-radius: 4px;">
+                            <option value="">-- Select Coordinator --</option>
+                            <?php 
+                            $coord_stmt = $pdo->query("SELECT id, full_name FROM users WHERE role_id = 4 AND status = 'active'");
+                            while($c = $coord_stmt->fetch()) {
+                                $selected = ($event && ($event['coordinator_id'] ?? '') == $c['id']) ? 'selected' : '';
+                                echo "<option value='" . $c['id'] . "' $selected>" . htmlspecialchars($c['full_name'] ?? '') . "</option>";
+                            }
+                            ?>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label style="display:block; margin-bottom:5px; color:var(--text-dark); font-weight:600;">Status</label>
+                        <select class="form-control" name="status" style="width: 100%; padding: 8px; border: 1px solid rgba(0,0,0,0.1); border-radius: 4px;">
+                            <option value="upcoming" <?php echo ($event && ($event['status'] ?? '') == 'upcoming') ? 'selected' : ''; ?>>Upcoming</option>
+                            <option value="ongoing" <?php echo ($event && ($event['status'] ?? '') == 'ongoing') ? 'selected' : ''; ?>>Ongoing</option>
+                            <option value="completed" <?php echo ($event && ($event['status'] ?? '') == 'completed') ? 'selected' : ''; ?>>Completed</option>
+                            <option value="cancelled" <?php echo ($event && ($event['status'] ?? '') == 'cancelled') ? 'selected' : ''; ?>>Cancelled</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                    <div class="form-group">
+                        <label style="display:block; margin-bottom:5px; color:var(--text-dark); font-weight:600;">Registration Deadline</label>
+                        <input type="datetime-local" name="registration_deadline" value="<?php echo ($event && $event['registration_deadline']) ? date('Y-m-d\TH:i', strtotime($event['registration_deadline'])) : ''; ?>" style="width: 100%; padding: 8px; border: 1px solid rgba(0,0,0,0.1); border-radius: 4px;">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label style="display:block; margin-bottom:5px; color:var(--text-dark); font-weight:600;">Expected Budget (₹)</label>
+                        <input class="form-control" type="number" step="0.01" name="expected_budget" value="<?php echo $event ? $event['expected_budget'] : ''; ?>" placeholder="0.00" style="width: 100%; padding: 8px; border: 1px solid rgba(0,0,0,0.1); border-radius: 4px;">
+                    </div>
+                </div>
+
+                <div class="form-group full-width" style="margin-bottom: 15px;">
+                    <label style="display:block; margin-bottom:5px; color:var(--text-dark); font-weight:600;">Description *</label>
+                    <textarea class="form-control" name="description" rows="4" required placeholder="Event details and instructions..." style="width: 100%; padding: 8px; border: 1px solid rgba(0,0,0,0.1); border-radius: 4px;"><?php echo $event ? htmlspecialchars($event['description'] ?? '') : ''; ?></textarea>
+                </div>
+            </div>
+            
+            <div class="modal-footer" style="margin-top: 20px; display: flex; justify-content: flex-end; gap: 10px;">
+                <button type="button" class="btn btn-secondary" data-modal-close="true">Cancel</button>
+                <button type="submit" class="btn btn-primary">Save Event</button>
+            </div>
+        </form>
+    </div>
+    <?php
+    exit;
+}
+// --- END AJAX MODAL HANDLER ---
+
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Event Management | <?php echo htmlspecialchars(APP_NAME); ?></title>
-    
-    <!-- Premium Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Dashboard Core CSS -->
-    <link rel="stylesheet" href="assets/css/dashboard.css">
-    
-    <style>
-        .filter-bar {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-        .filter-bar input, .filter-bar select {
-            padding: 10px 15px;
-            border: 1px solid rgba(0,0,0,0.1);
-            border-radius: 8px;
-            font-family: var(--font-body);
-            background: white;
-            min-width: 200px;
-        }
-        .filter-bar input:focus, .filter-bar select:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(124, 154, 134, 0.2);
-        }
-        .pagination {
-            display: flex;
-            justify-content: center;
-            gap: 5px;
-            margin-top: 20px;
-        }
-        .page-btn {
-            padding: 8px 12px;
-            border-radius: 6px;
-            border: 1px solid rgba(0,0,0,0.1);
-            background: white;
-            color: var(--text-dark);
-            text-decoration: none;
-            transition: all 0.2s;
-        }
-        .page-btn.active {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-        }
-        
-        /* Summary Cards */
-        .summary-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 25px;
-        }
-        .summary-card {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            border: 1px solid rgba(0,0,0,0.05);
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        .summary-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-        }
-        
-        /* Modal Styles */
-        .modal {
-            position: fixed;
-            inset: 0;
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(6px);
-            z-index: 1050;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
-        }
-        .modal.active {
-            opacity: 1;
-            visibility: visible;
-        }
-        .modal-content {
-            background: white;
-            padding: 25px;
-            border-radius: 16px;
-            width: 100%;
-            max-width: 700px;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            transform: scale(0.95);
-            transition: all 0.3s ease;
-        }
-        .modal.active .modal-content {
-            transform: scale(1);
-        }
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-        }
-        .modal-header h3 {
-            margin: 0;
-            font-size: 1.2rem;
-            color: var(--text-dark);
-        }
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 1.2rem;
-            color: var(--text-muted);
-            cursor: pointer;
-        }
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        .form-group.full-width {
-            grid-column: span 2;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            color: var(--text-dark);
-        }
-        .form-group input, .form-group select, .form-group textarea {
-            width: 100%;
-            padding: 10px 15px;
-            border: 1px solid rgba(0,0,0,0.1);
-            border-radius: 8px;
-            background: white;
-            font-family: var(--font-body);
-        }
-    </style>
-</head>
-<body>
+<?php 
 
-<div class="dashboard-layout">
-    <!-- Sidebar -->
-    <?php include __DIR__ . '/includes/dashboard/sidebar.php'; ?>
-
-    <main class="main-content">
-        <!-- Topbar -->
-        <?php include __DIR__ . '/includes/dashboard/topbar.php'; ?>
+$page_title = "Event Management";
+require_once __DIR__ . '/includes/dashboard/layout_header.php'; 
+?>
 
         <div class="page-content">
             <!-- Header Section -->
@@ -329,7 +276,7 @@ try {
                     </div>
                 </div>
                 <div class="header-actions">
-                    <button class="btn-primary" onclick="openEventModal()"><i class="fas fa-plus"></i> Create Event</button>
+                    <button data-ajax-modal="true" data-url="admin_events.php?modal=event_form" class="btn-primary"><i class="fas fa-plus"></i> Create Event</button>
                 </div>
             </div>
 
@@ -379,9 +326,9 @@ try {
             <!-- Filter Bar -->
             <div class="glass-card" style="margin-bottom: 20px;">
                 <form method="GET" action="admin_events.php" class="filter-bar">
-                    <input type="text" name="search" placeholder="Search events..." value="<?php echo htmlspecialchars($search); ?>">
+                    <input class="form-control" type="text" name="search" placeholder="Search events..." value="<?php echo htmlspecialchars($search); ?>">
                     
-                    <select name="status">
+                    <select class="form-control" name="status">
                         <option value="">All Statuses</option>
                         <option value="upcoming" <?php echo $status_filter === 'upcoming' ? 'selected' : ''; ?>>Upcoming</option>
                         <option value="ongoing" <?php echo $status_filter === 'ongoing' ? 'selected' : ''; ?>>Ongoing</option>
@@ -415,16 +362,16 @@ try {
                                 <?php foreach($events as $evt): ?>
                                 <tr>
                                     <td>
-                                        <div style="font-weight: 600; color: var(--text-dark);"><?php echo htmlspecialchars($evt['title']); ?></div>
-                                        <div style="font-size: 0.8rem; color: var(--text-muted);"><?php echo htmlspecialchars($evt['event_type']); ?></div>
+                                        <div style="font-weight: 600; color: var(--text-dark);"><?php echo htmlspecialchars($evt['title'] ?? ''); ?></div>
+                                        <div style="font-size: 0.8rem; color: var(--text-muted);"><?php echo htmlspecialchars($evt['event_type'] ?? ''); ?></div>
                                     </td>
                                     <td>
                                         <div style="color: var(--text-dark);"><i class="far fa-calendar"></i> <?php echo date('M d, Y', strtotime($evt['event_date'])); ?> (<?php echo date('h:i A', strtotime($evt['event_time'])); ?>)</div>
-                                        <div style="font-size: 0.8rem; color: var(--text-muted);"><i class="fas fa-map-marker-alt"></i> <?php echo htmlspecialchars($evt['venue']); ?></div>
+                                        <div style="font-size: 0.8rem; color: var(--text-muted);"><i class="fas fa-map-marker-alt"></i> <?php echo htmlspecialchars($evt['venue'] ?? ''); ?></div>
                                     </td>
-                                    <td><?php echo htmlspecialchars($evt['coordinator_name']); ?></td>
+                                    <td><?php echo htmlspecialchars($evt['coordinator_name'] ?? ''); ?></td>
                                     <td>
-                                        <span style="font-weight: 600; color: var(--primary);"><?php echo $evt['total_registrations']; ?></span> 
+                                        <span style="font-weight: 600; color: var(--primary);"><?php echo $evt['total_registrations'] ?? ''; ?></span> 
                                         <span style="color: var(--text-muted); font-size: 0.8rem;">/ <?php echo $evt['max_volunteers'] ?: '∞'; ?></span>
                                     </td>
                                     <td>
@@ -439,18 +386,18 @@ try {
                                             ];
                                         ?>
                                         <span class="badge" style="background: <?php echo $statusColors[$evt['status']]; ?>; color: <?php echo $textColors[$evt['status']]; ?>;">
-                                            <?php echo ucfirst(htmlspecialchars($evt['status'])); ?>
+                                            <?php echo ucfirst(htmlspecialchars($evt['status'] ?? '')); ?>
                                         </span>
                                     </td>
                                     <td>
                                         <div style="display: flex; gap: 8px;">
-                                            <button onclick='openEventModal(<?php echo json_encode($evt); ?>)' class="action-btn" style="width: 32px; height: 32px;" title="Edit Event">
+                                            <button data-ajax-modal="true" data-url="admin_events.php?modal=edit_event&id=<?php echo $evt['id'] ?? ''; ?>" class="action-btn" style="width: 32px; height: 32px;" title="Edit Event">
                                                 <i class="fas fa-edit"></i>
                                             </button>
                                             <form method="POST" action="admin_events.php" style="display: inline;" onsubmit="return confirm('Delete this event?');">
-                                                <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+                                                <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token'] ?? ''; ?>">
                                                 <input type="hidden" name="action" value="delete_event">
-                                                <input type="hidden" name="id" value="<?php echo $evt['id']; ?>">
+                                                <input type="hidden" name="id" value="<?php echo $evt['id'] ?? ''; ?>">
                                                 <button type="submit" class="action-btn" style="width: 32px; height: 32px; color: var(--danger);" title="Delete Event">
                                                     <i class="fas fa-trash"></i>
                                                 </button>
@@ -478,145 +425,5 @@ try {
             </div>
             
         </div>
-    </main>
-</div>
-
-<!-- Add/Edit Event Modal -->
-<div class="modal" id="eventModal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3 id="modalTitle">Create Event</h3>
-            <button class="modal-close" onclick="closeEventModal()"><i class="fas fa-times"></i></button>
-        </div>
-        <form method="POST" action="admin_events.php">
-            <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
-            <input type="hidden" name="action" id="formAction" value="create_event">
-            <input type="hidden" name="id" id="evt_id" value="">
-            
-            <div class="form-grid">
-                <div class="form-group full-width">
-                    <label>Event Title *</label>
-                    <input type="text" name="title" id="evt_title" required placeholder="e.g., Annual Beach Cleanup">
-                </div>
-                
-                <div class="form-group">
-                    <label>Event Type</label>
-                    <input type="text" name="event_type" id="evt_type" placeholder="e.g., Cleanup, Fundraiser">
-                </div>
-                
-                <div class="form-group">
-                    <label>Venue *</label>
-                    <input type="text" name="venue" id="evt_venue" required placeholder="Event location">
-                </div>
-                
-                <div class="form-group">
-                    <label>Date *</label>
-                    <input type="date" name="event_date" id="evt_date" required>
-                </div>
-                
-                <div class="form-group">
-                    <label>Time *</label>
-                    <input type="time" name="event_time" id="evt_time" required>
-                </div>
-                
-                <div class="form-group">
-                    <label>Max Volunteers</label>
-                    <input type="number" name="max_volunteers" id="evt_max" placeholder="Leave empty for unlimited">
-                </div>
-                
-                <div class="form-group">
-                    <label>Coordinator *</label>
-                    <select name="coordinator_id" id="evt_coordinator" required>
-                        <option value="">Select Coordinator</option>
-                        <?php foreach($coordinators as $coord): ?>
-                            <option value="<?php echo $coord['id']; ?>"><?php echo htmlspecialchars($coord['full_name'] . ' (' . $coord['role_name'] . ')'); ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-                
-                <div class="form-group full-width">
-                    <label>Description *</label>
-                    <textarea name="description" id="evt_desc" required placeholder="Event details and instructions..."></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label>Registration Deadline</label>
-                    <input type="datetime-local" name="registration_deadline" id="evt_deadline">
-                </div>
-
-                <div class="form-group">
-                    <label>Expected Budget (₹)</label>
-                    <input type="number" step="0.01" name="expected_budget" id="evt_budget" placeholder="0.00">
-                </div>
-
-                <div class="form-group">
-                    <label>Status *</label>
-                    <select name="status" id="evt_status" required>
-                        <option value="upcoming">Upcoming</option>
-                        <option value="ongoing">Ongoing</option>
-                        <option value="completed">Completed</option>
-                        <option value="cancelled">Cancelled</option>
-                    </select>
-                </div>
-            </div>
-            
-            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
-                <button type="button" class="btn-primary" style="background: rgba(0,0,0,0.05); color: var(--text-dark);" onclick="closeEventModal()">Cancel</button>
-                <button type="submit" class="btn-primary">Save Event</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<script src="assets/js/dashboard.js"></script>
-<script>
-    function openEventModal(event = null) {
-        if (event) {
-            document.getElementById('modalTitle').innerText = 'Edit Event';
-            document.getElementById('formAction').value = 'edit_event';
-            document.getElementById('evt_id').value = event.id;
-            document.getElementById('evt_title').value = event.title;
-            document.getElementById('evt_type').value = event.event_type;
-            document.getElementById('evt_venue').value = event.venue;
-            document.getElementById('evt_date').value = event.event_date;
-            document.getElementById('evt_time').value = event.event_time;
-            document.getElementById('evt_max').value = event.max_volunteers == 0 ? '' : event.max_volunteers;
-            document.getElementById('evt_coordinator').value = event.coordinator_id;
-            document.getElementById('evt_desc').value = event.description;
-            
-            if (event.registration_deadline) {
-                // Convert MySQL datetime to local datetime format for input type="datetime-local"
-                let dt = event.registration_deadline.replace(' ', 'T');
-                document.getElementById('evt_deadline').value = dt.substring(0, 16);
-            } else {
-                document.getElementById('evt_deadline').value = '';
-            }
-            
-            document.getElementById('evt_budget').value = event.expected_budget;
-            document.getElementById('evt_status').value = event.status;
-        } else {
-            document.getElementById('modalTitle').innerText = 'Create Event';
-            document.getElementById('formAction').value = 'create_event';
-            document.getElementById('evt_id').value = '';
-            document.getElementById('evt_title').value = '';
-            document.getElementById('evt_type').value = '';
-            document.getElementById('evt_venue').value = '';
-            document.getElementById('evt_date').value = '';
-            document.getElementById('evt_time').value = '';
-            document.getElementById('evt_max').value = '';
-            document.getElementById('evt_coordinator').value = '';
-            document.getElementById('evt_desc').value = '';
-            document.getElementById('evt_deadline').value = '';
-            document.getElementById('evt_budget').value = '';
-            document.getElementById('evt_status').value = 'upcoming';
-        }
-        
-        document.getElementById('eventModal').classList.add('active');
-    }
     
-    function closeEventModal() {
-        document.getElementById('eventModal').classList.remove('active');
-    }
-</script>
-</body>
-</html>
+<?php require_once __DIR__ . '/includes/dashboard/layout_footer.php'; ?>

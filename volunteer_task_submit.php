@@ -148,32 +148,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Submit Work | <?php echo APP_NAME; ?></title>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="assets/css/dashboard.css">
-</head>
-<body>
-
-<div class="dashboard-layout">
-    <?php include __DIR__ . '/includes/dashboard/sidebar.php'; ?>
-    <main class="main-content">
-        <?php include __DIR__ . '/includes/dashboard/topbar.php'; ?>
+<?php 
+$page_title = "Submit Work";
+require_once __DIR__ . '/includes/dashboard/layout_header.php'; 
+?>
 
         <div class="page-content">
             <div class="page-header" style="margin-bottom: 30px;">
                 <div class="page-title">
                     <a href="volunteer_tasks.php" style="color: var(--primary); text-decoration: none; font-size: 0.9rem; margin-bottom: 10px; display: inline-block;"><i class="fas fa-arrow-left"></i> Back to Tasks</a>
                     <h1>Submit Work</h1>
-                    <p style="color: var(--text-muted); margin-top: 5px;">Task: <strong style="color: var(--text-dark);"><?php echo htmlspecialchars($task['task_name']); ?></strong> (<?php echo htmlspecialchars($task['event_title']); ?>)</p>
+                    <p style="color: var(--text-muted); margin-top: 5px;">Task: <strong style="color: var(--text-dark);"><?php echo htmlspecialchars($task['task_name'] ?? ''); ?></strong> (<?php echo htmlspecialchars($task['event_title'] ?? ''); ?>)</p>
                 </div>
             </div>
 
@@ -181,10 +166,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div style="padding: 15px; background: rgba(239,68,68,0.1); color: var(--danger); border-radius: 8px; margin-bottom: 20px;"><i class="fas fa-exclamation-circle"></i> <?php echo htmlspecialchars($error_msg); ?></div>
             <?php endif; ?>
 
-            <?php if ($submission && $submission['status'] === 'needs_revision' && !empty($submission['coordinator_feedback'])): ?>
+            <?php if ($submission && ($submission['status'] ?? '') === 'needs_revision' && !empty($submission['coordinator_feedback'])): ?>
                 <div style="padding: 20px; background: rgba(245,158,11,0.1); border-left: 4px solid var(--warning); border-radius: 8px; margin-bottom: 20px;">
                     <h3 style="margin:0 0 10px 0; color: #b45309;"><i class="fas fa-exclamation-triangle"></i> Revision Requested</h3>
-                    <p style="margin:0; color: #92400e; font-size: 0.95rem;"><strong>Feedback:</strong> <?php echo nl2br(htmlspecialchars($submission['coordinator_feedback'])); ?></p>
+                    <p style="margin:0; color: #92400e; font-size: 0.95rem;"><strong>Feedback:</strong> <?php echo nl2br(htmlspecialchars($submission['coordinator_feedback'] ?? '')); ?></p>
                 </div>
             <?php endif; ?>
 
@@ -193,25 +178,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div style="margin-bottom: 20px;">
                         <label for="summary" style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-dark);">Work Summary <span style="color: var(--danger);">*</span></label>
                         <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0; margin-bottom: 10px;">Describe what was completed (30 - 1000 characters).</p>
-                        <textarea name="summary" id="summary" required minlength="30" maxlength="1000" rows="5" class="modern-input" style="resize: vertical;"><?php echo $submission ? htmlspecialchars($submission['summary']) : ''; ?></textarea>
+                        <textarea name="summary" id="summary" required minlength="30" maxlength="1000" rows="5" class="modern-input form-control" style="resize: vertical;"><?php echo $submission ? htmlspecialchars($submission['summary'] ?? '') : ''; ?></textarea>
                     </div>
 
                     <div style="display: flex; gap: 20px; margin-bottom: 20px;">
                         <div style="flex: 1;">
                             <label for="hours_contributed" style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-dark);">Hours Contributed (Optional)</label>
-                            <input type="number" step="0.1" min="0" name="hours_contributed" id="hours_contributed" class="modern-input" value="<?php echo $submission ? htmlspecialchars($submission['hours_contributed']) : ''; ?>">
+                            <input type="number" step="0.1" min="0" name="hours_contributed" id="hours_contributed" class="modern-input" value="<?php echo $submission ? htmlspecialchars($submission['hours_contributed'] ?? '') : ''; ?>">
                         </div>
                         <div style="flex: 1;"></div>
                     </div>
 
                     <div style="margin-bottom: 20px;">
                         <label for="challenges_faced" style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-dark);">Challenges Faced (Optional)</label>
-                        <textarea name="challenges_faced" id="challenges_faced" rows="3" class="modern-input" style="resize: vertical;"><?php echo $submission ? htmlspecialchars($submission['challenges_faced']) : ''; ?></textarea>
+                        <textarea name="challenges_faced" id="challenges_faced" rows="3" class="modern-input form-control" style="resize: vertical;"><?php echo $submission ? htmlspecialchars($submission['challenges_faced'] ?? '') : ''; ?></textarea>
                     </div>
 
                     <div style="margin-bottom: 25px;">
                         <label for="suggestions" style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-dark);">Suggestions (Optional)</label>
-                        <textarea name="suggestions" id="suggestions" rows="3" class="modern-input" style="resize: vertical;"><?php echo $submission ? htmlspecialchars($submission['suggestions']) : ''; ?></textarea>
+                        <textarea name="suggestions" id="suggestions" rows="3" class="modern-input form-control" style="resize: vertical;"><?php echo $submission ? htmlspecialchars($submission['suggestions'] ?? '') : ''; ?></textarea>
                     </div>
 
                     <div style="margin-bottom: 30px; padding: 20px; border: 1px dashed var(--border-color); border-radius: 12px; background: rgba(0,0,0,0.02);">
@@ -240,10 +225,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
 
         </div>
-    </main>
-</div>
-
-<script src="assets/js/dashboard.js"></script>
-
-</body>
-</html>
+    
+<?php require_once __DIR__ . '/includes/dashboard/layout_footer.php'; ?>

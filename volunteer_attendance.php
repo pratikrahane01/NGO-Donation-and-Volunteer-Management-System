@@ -60,25 +60,10 @@ $activeSessions = $activeStmt->fetchAll(PDO::FETCH_ASSOC);
 // Fetch Attendance History
 $attendance = get_volunteer_attendance_history($pdo, $volunteer_id, 50); // Get up to 50 records
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Attendance | <?php echo APP_NAME; ?></title>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="assets/css/dashboard.css">
-</head>
-<body>
-
-<div class="dashboard-layout">
-    <?php include __DIR__ . '/includes/dashboard/sidebar.php'; ?>
-    <main class="main-content">
-        <?php include __DIR__ . '/includes/dashboard/topbar.php'; ?>
+<?php 
+$page_title = "My Attendance";
+require_once __DIR__ . '/includes/dashboard/layout_header.php'; 
+?>
 
         <div class="page-content">
             <div class="page-header">
@@ -104,11 +89,11 @@ $attendance = get_volunteer_attendance_history($pdo, $volunteer_id, 50); // Get 
                     <div style="display: flex; gap: 15px; flex-wrap: wrap;">
                         <?php foreach($activeSessions as $session): ?>
                             <div style="flex: 1; min-width: 300px; padding: 20px; border-radius: 12px; border: 1px solid var(--border-color); background: rgba(0,0,0,0.02);">
-                                <h4 style="margin: 0 0 10px 0;"><?php echo htmlspecialchars($session['title']); ?></h4>
+                                <h4 style="margin: 0 0 10px 0;"><?php echo htmlspecialchars($session['title'] ?? ''); ?></h4>
                                 
                                 <?php if (empty($session['check_in'])): ?>
                                     <form method="POST">
-                                        <input type="hidden" name="event_id" value="<?php echo $session['id']; ?>">
+                                        <input type="hidden" name="event_id" value="<?php echo $session['id'] ?? ''; ?>">
                                         <input type="hidden" name="action" value="check_in">
                                         <button type="submit" class="btn-primary" style="width: 100%; justify-content: center;"><i class="fas fa-sign-in-alt"></i> Check In</button>
                                     </form>
@@ -117,7 +102,7 @@ $attendance = get_volunteer_attendance_history($pdo, $volunteer_id, 50); // Get 
                                         <i class="fas fa-check-circle"></i> Checked in at <?php echo date('g:i A', strtotime($session['check_in'])); ?>
                                     </div>
                                     <form method="POST">
-                                        <input type="hidden" name="event_id" value="<?php echo $session['id']; ?>">
+                                        <input type="hidden" name="event_id" value="<?php echo $session['id'] ?? ''; ?>">
                                         <input type="hidden" name="action" value="check_out">
                                         <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; background: var(--danger);"><i class="fas fa-sign-out-alt"></i> Check Out</button>
                                     </form>
@@ -150,7 +135,7 @@ $attendance = get_volunteer_attendance_history($pdo, $volunteer_id, 50); // Get 
                 <div style="margin-right: 20px;">
                     <h3 style="margin: 0; color: var(--text-dark); font-size: 1.1rem;">Attendance Rate</h3>
                     <div style="font-family: var(--font-stats); font-weight: 700; font-size: 2rem; color: var(--success);">
-                        <?php echo $kpis['attendance_percentage']; ?>%
+                        <?php echo $kpis['attendance_percentage'] ?? ''; ?>%
                     </div>
                 </div>
             </div>
@@ -178,7 +163,7 @@ $attendance = get_volunteer_attendance_history($pdo, $volunteer_id, 50); // Get 
                                 <?php foreach($attendance as $att): ?>
                                 <tr>
                                     <td>
-                                        <strong style="color: var(--text-dark); display: block;"><?php echo htmlspecialchars($att['event_title']); ?></strong>
+                                        <strong style="color: var(--text-dark); display: block;"><?php echo htmlspecialchars($att['event_title'] ?? ''); ?></strong>
                                     </td>
                                     <td>
                                         <span style="font-size: 0.85rem; color: var(--text-dark); font-weight: 600;"><?php echo date('M d, Y', strtotime($att['event_date'])); ?></span>
@@ -190,7 +175,7 @@ $attendance = get_volunteer_attendance_history($pdo, $volunteer_id, 50); // Get 
                                         <span style="font-size: 0.85rem; color: var(--text-muted);"><i class="fas fa-sign-out-alt"></i> <?php echo $att['check_out'] ? date('g:i A', strtotime($att['check_out'])) : '-'; ?></span>
                                     </td>
                                     <td>
-                                        <strong style="color: var(--primary);"><?php echo $att['hours'] !== null ? number_format($att['hours'], 1) : '-'; ?></strong>
+                                        <strong style="color: var(--primary);"><?php echo ($att['hours'] ?? '') !== null ? number_format($att['hours'], 1) : '-'; ?></strong>
                                     </td>
                                     <td>
                                         <?php 
@@ -209,10 +194,5 @@ $attendance = get_volunteer_attendance_history($pdo, $volunteer_id, 50); // Get 
             </div>
 
         </div>
-    </main>
-</div>
-
-<script src="assets/js/dashboard.js"></script>
-
-</body>
-</html>
+    
+<?php require_once __DIR__ . '/includes/dashboard/layout_footer.php'; ?>

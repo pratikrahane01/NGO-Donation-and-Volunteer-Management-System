@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         if ($action === 'update_approval') {
             $reg_id = filter_var($_POST['reg_id'], FILTER_VALIDATE_INT);
-            $status = htmlspecialchars($_POST['approval_status']);
+            $status = htmlspecialchars($_POST['approval_status'] ?? '');
             
             if ($reg_id && in_array($status, ['pending', 'approved', 'rejected'])) {
                 try {
@@ -143,142 +143,116 @@ function calculateHours($checkIn, $checkOut) {
     return 0;
 }
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Volunteer Management | <?php echo htmlspecialchars(APP_NAME); ?></title>
+<?php 
+// --- AJAX MODAL HANDLER ---
+if (isset($_GET['modal'])) {
     
-    <!-- Premium Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Dashboard Core CSS -->
-    <link rel="stylesheet" href="assets/css/dashboard.css">
-    
-    <style>
-        .filter-bar {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-        .filter-bar input, .filter-bar select {
-            padding: 10px 15px;
-            border: 1px solid rgba(0,0,0,0.1);
-            border-radius: 8px;
-            font-family: var(--font-body);
-            background: white;
-            min-width: 200px;
-        }
-        .filter-bar input:focus, .filter-bar select:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(124, 154, 134, 0.2);
-        }
-        .pagination {
-            display: flex;
-            justify-content: center;
-            gap: 5px;
-            margin-top: 20px;
-        }
-        .page-btn {
-            padding: 8px 12px;
-            border-radius: 6px;
-            border: 1px solid rgba(0,0,0,0.1);
-            background: white;
-            color: var(--text-dark);
-            text-decoration: none;
-            transition: all 0.2s;
-        }
-        .page-btn.active {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-        }
+    if ($_GET['modal'] === 'approval_form') {
+        $reg_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+        $stmt = $pdo->prepare("
+            SELECT er.*, u.full_name, e.title as event_title 
+            FROM volunteer_registrations er 
+            JOIN users u ON er.volunteer_id = u.id 
+            JOIN events e ON er.event_id = e.id 
+            WHERE er.id = ?
+        ");
+        $stmt->execute([$reg_id]);
+        $reg = $stmt->fetch(PDO::FETCH_ASSOC);
         
-        /* Modal Styles */
-        .modal {
-            position: fixed;
-            inset: 0;
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(6px);
-            z-index: 1050;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
+        if ($reg) {
+            ?>
+            <div class="modal">
+                <div class="modal-header">
+                    <h2>Update Approval Status</h2>
+                    <button type="button" class="close-btn" data-modal-close="true"><i class="fas fa-times"></i></button>
+                </div>
+                <form method="POST" action="<?php echo basename(__FILE__); ?>" class="ajax-form">
+                    <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token'] ?? ''; ?>">
+                    <input type="hidden" name="action" value="update_approval">
+                    <input type="hidden" name="reg_id" value="<?php echo $reg['id'] ?? ''; ?>">
+                    
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>Volunteer & Event</label>
+                            <input class="form-control" type="text" value="<?php echo htmlspecialchars($reg['full_name'] . ' - ' . $reg['event_title']); ?>" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label>Status</label>
+                            <select class="form-control" name="status" required>
+                                <option value="pending" <?php echo ($reg['approval_status'] ?? '') == 'pending' ? 'selected' : ''; ?>>Pending</option>
+                                <option value="approved" <?php echo ($reg['approval_status'] ?? '') == 'approved' ? 'selected' : ''; ?>>Approved</option>
+                                <option value="rejected" <?php echo ($reg['approval_status'] ?? '') == 'rejected' ? 'selected' : ''; ?>>Rejected</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-modal-close="true">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+            <?php
         }
-        .modal.active {
-            opacity: 1;
-            visibility: visible;
-        }
-        .modal-content {
-            background: white;
-            padding: 25px;
-            border-radius: 16px;
-            width: 100%;
-            max-width: 500px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            transform: scale(0.95);
-            transition: all 0.3s ease;
-        }
-        .modal.active .modal-content {
-            transform: scale(1);
-        }
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-        }
-        .modal-header h3 {
-            margin: 0;
-            font-size: 1.2rem;
-            color: var(--text-dark);
-        }
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 1.2rem;
-            color: var(--text-muted);
-            cursor: pointer;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            color: var(--text-dark);
-        }
-        .form-group input, .form-group select {
-            width: 100%;
-            padding: 10px 15px;
-            border: 1px solid rgba(0,0,0,0.1);
-            border-radius: 8px;
-            background: white;
-            font-family: var(--font-body);
-        }
-    </style>
-</head>
-<body>
+        exit;
+    }
 
-<div class="dashboard-layout">
-    <!-- Sidebar -->
-    <?php include __DIR__ . '/includes/dashboard/sidebar.php'; ?>
+    if ($_GET['modal'] === 'attendance_form') {
+        $reg_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+        $stmt = $pdo->prepare("SELECT * FROM volunteer_registrations WHERE id = ?");
+        $stmt->execute([$reg_id]);
+        $reg = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if ($reg) {
+            ?>
+            <div class="modal">
+                <div class="modal-header">
+                    <h2>Update Attendance</h2>
+                    <button type="button" class="close-btn" data-modal-close="true"><i class="fas fa-times"></i></button>
+                </div>
+                <form method="POST" action="<?php echo basename(__FILE__); ?>" class="ajax-form">
+                    <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token'] ?? ''; ?>">
+                    <input type="hidden" name="action" value="update_attendance">
+                    <input type="hidden" name="reg_id" value="<?php echo $reg['id'] ?? ''; ?>">
+                    <input type="hidden" name="volunteer_id" value="<?php echo $reg['volunteer_id'] ?? ''; ?>">
+                    <input type="hidden" name="event_id" value="<?php echo $reg['event_id'] ?? ''; ?>">
+                    
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>Attendance Status</label>
+                            <select class="form-control" name="attendance_status" required>
+                                <option value="present" <?php echo ($reg['specific_attendance'] ?? '') == 'present' ? 'selected' : ''; ?>>Present</option>
+                                <option value="absent" <?php echo ($reg['specific_attendance'] ?? '') == 'absent' ? 'selected' : ''; ?>>Absent</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                            <div>
+                                <label>Check In</label>
+                                <input type="datetime-local" name="check_in" value="<?php echo !empty($reg['check_in']) ? str_replace(' ', 'T', substr($reg['check_in'], 0, 16)) : ''; ?>">
+                            </div>
+                            <div>
+                                <label>Check Out</label>
+                                <input type="datetime-local" name="check_out" value="<?php echo !empty($reg['check_out']) ? str_replace(' ', 'T', substr($reg['check_out'], 0, 16)) : ''; ?>">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-modal-close="true">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Attendance</button>
+                    </div>
+                </form>
+            </div>
+            <?php
+        }
+        exit;
+    }
+}
+// --- END AJAX MODAL HANDLER ---
 
-    <main class="main-content">
-        <!-- Topbar -->
-        <?php include __DIR__ . '/includes/dashboard/topbar.php'; ?>
+$page_title = "Volunteer Management";
+require_once __DIR__ . '/includes/dashboard/layout_header.php'; 
+?>
 
         <div class="page-content">
             <!-- Header Section -->
@@ -308,18 +282,18 @@ function calculateHours($checkIn, $checkOut) {
             <!-- Filter Bar -->
             <div class="glass-card" style="margin-bottom: 20px;">
                 <form method="GET" action="coordinator_volunteers.php" class="filter-bar">
-                    <input type="text" name="search" placeholder="Search volunteer..." value="<?php echo htmlspecialchars($search); ?>">
+                    <input class="form-control" type="text" name="search" placeholder="Search volunteer..." value="<?php echo htmlspecialchars($search); ?>">
                     
-                    <select name="event_id">
+                    <select class="form-control" name="event_id">
                         <option value="">All Events</option>
                         <?php foreach($allEvents as $evt): ?>
-                            <option value="<?php echo $evt['id']; ?>" <?php echo $event_filter == $evt['id'] ? 'selected' : ''; ?>>
-                                <?php echo htmlspecialchars($evt['title']); ?>
+                            <option value="<?php echo $evt['id'] ?? ''; ?>" <?php echo $event_filter == $evt['id'] ? 'selected' : ''; ?>>
+                                <?php echo htmlspecialchars($evt['title'] ?? ''); ?>
                             </option>
                         <?php endforeach; ?>
                     </select>
 
-                    <select name="status">
+                    <select class="form-control" name="status">
                         <option value="">All Statuses</option>
                         <option value="pending" <?php echo $status_filter === 'pending' ? 'selected' : ''; ?>>Pending</option>
                         <option value="approved" <?php echo $status_filter === 'approved' ? 'selected' : ''; ?>>Approved</option>
@@ -354,12 +328,12 @@ function calculateHours($checkIn, $checkOut) {
                                 <?php $hours = calculateHours($reg['check_in'], $reg['check_out']); ?>
                                 <tr>
                                     <td>
-                                        <div style="font-weight: 600; color: var(--text-dark);"><?php echo htmlspecialchars($reg['full_name']); ?></div>
-                                        <div style="font-size: 0.8rem; color: var(--text-muted);"><?php echo htmlspecialchars($reg['email']); ?></div>
-                                        <div style="font-size: 0.8rem; color: var(--text-muted);"><?php echo htmlspecialchars($reg['phone']); ?></div>
+                                        <div style="font-weight: 600; color: var(--text-dark);"><?php echo htmlspecialchars($reg['full_name'] ?? ''); ?></div>
+                                        <div style="font-size: 0.8rem; color: var(--text-muted);"><?php echo htmlspecialchars($reg['email'] ?? ''); ?></div>
+                                        <div style="font-size: 0.8rem; color: var(--text-muted);"><?php echo htmlspecialchars($reg['phone'] ?? ''); ?></div>
                                     </td>
                                     <td>
-                                        <div style="color: var(--text-dark);"><?php echo htmlspecialchars($reg['event_title']); ?></div>
+                                        <div style="color: var(--text-dark);"><?php echo htmlspecialchars($reg['event_title'] ?? ''); ?></div>
                                         <div style="font-size: 0.8rem; color: var(--text-muted);"><?php echo date('M d, Y', strtotime($reg['event_date'])); ?></div>
                                     </td>
                                     <td>
@@ -367,7 +341,7 @@ function calculateHours($checkIn, $checkOut) {
                                     </td>
                                     <td>
                                         <span class="badge" style="background: rgba(0,0,0,0.05); color: var(--text-dark);">
-                                            <?php echo $reg['tasks_completed']; ?> / <?php echo $reg['tasks_assigned']; ?>
+                                            <?php echo $reg['tasks_completed'] ?? ''; ?> / <?php echo $reg['tasks_assigned'] ?? ''; ?>
                                         </span>
                                     </td>
                                     <td>
@@ -385,21 +359,21 @@ function calculateHours($checkIn, $checkOut) {
                                             ];
                                         ?>
                                         <span class="badge" style="background: <?php echo $statusColors[$reg['approval_status']]; ?>; color: <?php echo $textColors[$reg['approval_status']]; ?>; margin-bottom: 5px; display: inline-block;">
-                                            <?php echo ucfirst(htmlspecialchars($reg['approval_status'])); ?>
+                                            <?php echo ucfirst(htmlspecialchars($reg['approval_status'] ?? '')); ?>
                                         </span>
                                         <br>
                                         <?php if($reg['specific_attendance']): ?>
                                             <span class="badge" style="background: rgba(0,0,0,0.05); color: var(--text-muted);">
-                                                <i class="fas fa-clock"></i> <?php echo ucfirst(htmlspecialchars($reg['specific_attendance'])); ?>
+                                                <i class="fas fa-clock"></i> <?php echo ucfirst(htmlspecialchars($reg['specific_attendance'] ?? '')); ?>
                                             </span>
                                         <?php endif; ?>
                                     </td>
                                     <td>
                                         <div style="display: flex; gap: 8px;">
-                                            <button onclick='openApprovalModal(<?php echo json_encode($reg); ?>)' class="action-btn" style="width: 32px; height: 32px;" title="Update Approval Status">
+                                            <button data-ajax-modal="true" data-url="coordinator_volunteers.php?modal=approval_form&id=<?php echo $reg['id'] ?? ''; ?>" class="action-btn" style="width: 32px; height: 32px;" title="Update Approval Status">
                                                 <i class="fas fa-check-circle"></i>
                                             </button>
-                                            <button onclick='openAttendanceModal(<?php echo json_encode($reg); ?>)' class="action-btn" style="width: 32px; height: 32px; color: var(--primary);" title="Update Attendance & Hours">
+                                            <button data-ajax-modal="true" data-url="coordinator_volunteers.php?modal=attendance_form&id=<?php echo $reg['id'] ?? ''; ?>" class="action-btn" style="width: 32px; height: 32px; color: var(--primary);" title="Update Attendance & Hours">
                                                 <i class="fas fa-user-clock"></i>
                                             </button>
                                         </div>
@@ -425,86 +399,7 @@ function calculateHours($checkIn, $checkOut) {
             </div>
             
         </div>
-    </main>
-</div>
-
-<!-- Approval Modal -->
-<div class="modal" id="approvalModal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3>Update Registration Status</h3>
-            <button class="modal-close" onclick="closeApprovalModal()"><i class="fas fa-times"></i></button>
-        </div>
-        <form method="POST" action="coordinator_volunteers.php">
-            <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
-            <input type="hidden" name="action" value="update_approval">
-            <input type="hidden" name="reg_id" id="appr_reg_id" value="">
-            
-            <div class="form-group">
-                <label>Volunteer</label>
-                <input type="text" id="appr_name" readonly style="background: #f9f9f9;">
-            </div>
-            
-            <div class="form-group">
-                <label>Approval Status</label>
-                <select name="approval_status" id="appr_status" required>
-                    <option value="pending">Pending</option>
-                    <option value="approved">Approved</option>
-                    <option value="rejected">Rejected</option>
-                </select>
-            </div>
-            
-            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
-                <button type="button" class="btn-primary" style="background: rgba(0,0,0,0.05); color: var(--text-dark);" onclick="closeApprovalModal()">Cancel</button>
-                <button type="submit" class="btn-primary">Save Changes</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<!-- Attendance Modal -->
-<div class="modal" id="attendanceModal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3>Update Attendance & Hours</h3>
-            <button class="modal-close" onclick="closeAttendanceModal()"><i class="fas fa-times"></i></button>
-        </div>
-        <form method="POST" action="coordinator_volunteers.php">
-            <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
-            <input type="hidden" name="action" value="update_attendance">
-            <input type="hidden" name="reg_id" id="att_reg_id" value="">
-            <input type="hidden" name="vol_id" id="att_vol_id" value="">
-            <input type="hidden" name="evt_id" id="att_evt_id" value="">
-            
-            <div class="form-group">
-                <label>Attendance Status</label>
-                <select name="attendance_status" id="att_status" required>
-                    <option value="present">Present</option>
-                    <option value="late">Late</option>
-                    <option value="absent">Absent</option>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label>Check In Time</label>
-                <input type="datetime-local" name="check_in" id="att_checkin">
-            </div>
-            
-            <div class="form-group">
-                <label>Check Out Time</label>
-                <input type="datetime-local" name="check_out" id="att_checkout">
-            </div>
-            
-            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
-                <button type="button" class="btn-primary" style="background: rgba(0,0,0,0.05); color: var(--text-dark);" onclick="closeAttendanceModal()">Cancel</button>
-                <button type="submit" class="btn-primary">Save Attendance</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<script src="assets/js/dashboard.js"></script>
-<script>
+    <script>
     function formatDT(mysqlDT) {
         if (!mysqlDT) return '';
         return mysqlDT.replace(' ', 'T').substring(0, 16);
@@ -538,5 +433,4 @@ function calculateHours($checkIn, $checkOut) {
         document.getElementById('attendanceModal').classList.remove('active');
     }
 </script>
-</body>
-</html>
+<?php require_once __DIR__ . '/includes/dashboard/layout_footer.php'; ?>

@@ -105,145 +105,10 @@ $stmt->execute();
 $broadcasts = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Notifications & Communications | <?php echo htmlspecialchars(APP_NAME); ?></title>
-    
-    <!-- Premium Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Dashboard Core CSS -->
-    <link rel="stylesheet" href="assets/css/dashboard.css">
-    
-    <style>
-        .layout-grid {
-            display: grid;
-            grid-template-columns: 1fr 2fr;
-            gap: 25px;
-        }
-        @media (max-width: 992px) {
-            .layout-grid { grid-template-columns: 1fr; }
-        }
-        
-        .form-card {
-            background: white;
-            padding: 25px;
-            border-radius: 16px;
-            border: 1px solid rgba(0,0,0,0.05);
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
-        }
-        .form-group {
-            margin-bottom: 20px;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: var(--text-dark);
-            font-size: 0.9rem;
-        }
-        .form-group input, .form-group select, .form-group textarea {
-            width: 100%;
-            padding: 12px 15px;
-            border: 1px solid rgba(0,0,0,0.1);
-            border-radius: 8px;
-            font-family: var(--font-body);
-            transition: all 0.2s;
-            background: #f9f9f9;
-        }
-        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(124, 154, 134, 0.2);
-            background: white;
-        }
-        .form-group textarea {
-            resize: vertical;
-            min-height: 120px;
-        }
-        
-        .broadcast-item {
-            padding: 20px;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-            display: flex;
-            gap: 15px;
-            align-items: flex-start;
-        }
-        .broadcast-item:last-child {
-            border-bottom: none;
-        }
-        .broadcast-icon {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            background: rgba(124, 154, 134, 0.1);
-            color: var(--primary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            flex-shrink: 0;
-        }
-        .broadcast-content {
-            flex: 1;
-        }
-        .broadcast-title {
-            font-weight: 700;
-            color: var(--text-dark);
-            margin-bottom: 5px;
-        }
-        .broadcast-meta {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            margin-bottom: 10px;
-            display: flex;
-            gap: 15px;
-        }
-        .broadcast-text {
-            color: var(--text-dark);
-            font-size: 0.9rem;
-            line-height: 1.5;
-            background: rgba(0,0,0,0.02);
-            padding: 12px;
-            border-radius: 8px;
-            border-left: 3px solid var(--primary);
-        }
-        .pagination {
-            display: flex;
-            justify-content: center;
-            gap: 5px;
-            padding: 20px;
-            border-top: 1px solid rgba(0,0,0,0.05);
-        }
-        .page-btn {
-            padding: 8px 12px;
-            border-radius: 6px;
-            border: 1px solid rgba(0,0,0,0.1);
-            background: white;
-            color: var(--text-dark);
-            text-decoration: none;
-            transition: all 0.2s;
-        }
-        .page-btn.active {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-        }
-    </style>
-</head>
-<body>
-
-<div class="dashboard-layout">
-    <!-- Sidebar -->
-    <?php include __DIR__ . '/includes/dashboard/sidebar.php'; ?>
-
-    <main class="main-content">
-        <!-- Topbar -->
-        <?php include __DIR__ . '/includes/dashboard/topbar.php'; ?>
+<?php 
+$page_title = "Notifications & Communications";
+require_once __DIR__ . '/includes/dashboard/layout_header.php'; 
+?>
 
         <div class="page-content">
             <!-- Header Section -->
@@ -278,17 +143,17 @@ $broadcasts = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <i class="fas fa-paper-plane" style="color: var(--primary);"></i> Send Broadcast
                         </h3>
                         <form method="POST" action="admin_notifications.php" onsubmit="return confirm('Are you sure you want to send this broadcast?');">
-                            <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+                            <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token'] ?? ''; ?>">
                             <input type="hidden" name="action" value="send_broadcast">
                             
                             <div class="form-group">
                                 <label>Target Audience *</label>
-                                <select name="target" required>
+                                <select class="form-control" name="target" required>
                                     <option value="">Select Audience...</option>
                                     <option value="all" style="font-weight: bold;">All Users</option>
                                     <optgroup label="By Role">
                                         <?php foreach($roles as $role): ?>
-                                            <option value="role_<?php echo $role['id']; ?>">All <?php echo htmlspecialchars($role['name']); ?>s</option>
+                                            <option value="role_<?php echo $role['id'] ?? ''; ?>">All <?php echo htmlspecialchars($role['name'] ?? ''); ?>s</option>
                                         <?php endforeach; ?>
                                     </optgroup>
                                 </select>
@@ -296,12 +161,12 @@ $broadcasts = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             
                             <div class="form-group">
                                 <label>Notification Title *</label>
-                                <input type="text" name="title" required placeholder="e.g., Important Platform Update">
+                                <input class="form-control" type="text" name="title" required placeholder="e.g., Important Platform Update">
                             </div>
                             
                             <div class="form-group">
                                 <label>Message *</label>
-                                <textarea name="message" required placeholder="Write your message here..."></textarea>
+                                <textarea class="form-control" name="message" required placeholder="Write your message here..."></textarea>
                             </div>
                             
                             <button type="submit" class="btn-primary" style="width: 100%; justify-content: center;">
@@ -331,14 +196,14 @@ $broadcasts = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                             <i class="fas fa-bullhorn"></i>
                                         </div>
                                         <div class="broadcast-content">
-                                            <div class="broadcast-title"><?php echo htmlspecialchars($bc['title']); ?></div>
+                                            <div class="broadcast-title"><?php echo htmlspecialchars($bc['title'] ?? ''); ?></div>
                                             <div class="broadcast-meta">
                                                 <span><i class="far fa-clock"></i> <?php echo date('M d, Y H:i', strtotime($bc['created_at'])); ?></span>
-                                                <span><i class="fas fa-users"></i> Sent to <?php echo $bc['recipient_count']; ?> users</span>
-                                                <span style="color: var(--success);"><i class="fas fa-check-double"></i> <?php echo $bc['read_count']; ?> read</span>
+                                                <span><i class="fas fa-users"></i> Sent to <?php echo $bc['recipient_count'] ?? ''; ?> users</span>
+                                                <span style="color: var(--success);"><i class="fas fa-check-double"></i> <?php echo $bc['read_count'] ?? ''; ?> read</span>
                                             </div>
                                             <div class="broadcast-text">
-                                                <?php echo nl2br(htmlspecialchars($bc['message'])); ?>
+                                                <?php echo nl2br(htmlspecialchars($bc['message'] ?? '')); ?>
                                             </div>
                                         </div>
                                     </div>
@@ -361,9 +226,5 @@ $broadcasts = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </div>
             
         </div>
-    </main>
-</div>
-
-<script src="assets/js/dashboard.js"></script>
-</body>
-</html>
+    
+<?php require_once __DIR__ . '/includes/dashboard/layout_footer.php'; ?>

@@ -53,8 +53,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         if ($action === 'create_task') {
             $volunteer_event = $_POST['volunteer_event'] ?? ''; // Format: volunteer_id|event_id
-            $task_name = htmlspecialchars($_POST['task_name']);
-            $description = htmlspecialchars($_POST['description']);
+            $task_name = htmlspecialchars($_POST['task_name'] ?? '');
+            $description = htmlspecialchars($_POST['description'] ?? '');
             $priority = $_POST['priority'];
             $deadline = $_POST['deadline'] ?: null;
             
@@ -85,8 +85,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         } elseif ($action === 'update_task') {
             $task_id = filter_var($_POST['task_id'], FILTER_VALIDATE_INT);
-            $task_name = htmlspecialchars($_POST['task_name']);
-            $description = htmlspecialchars($_POST['description']);
+            $task_name = htmlspecialchars($_POST['task_name'] ?? '');
+            $description = htmlspecialchars($_POST['description'] ?? '');
             $priority = $_POST['priority'];
             $deadline = $_POST['deadline'] ?: null;
             $status = $_POST['completion_status'];
@@ -98,7 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $check->execute([$task_id]);
                     $taskData = $check->fetch(PDO::FETCH_ASSOC);
                     
-                    if ($taskData && $taskData['coordinator_id'] == $_SESSION['user_id']) {
+                    if ($taskData && ($taskData['coordinator_id'] ?? '') == $_SESSION['user_id']) {
                         $stmt = $pdo->prepare("UPDATE tasks SET task_name = ?, description = ?, priority = ?, deadline = ?, completion_status = ? WHERE id = ?");
                         $stmt->execute([$task_name, $description, $priority, $deadline, $status, $task_id]);
                         
@@ -122,7 +122,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $check->execute([$task_id]);
                     $taskData = $check->fetch(PDO::FETCH_ASSOC);
                     
-                    if ($taskData && $taskData['coordinator_id'] == $_SESSION['user_id']) {
+                    if ($taskData && ($taskData['coordinator_id'] ?? '') == $_SESSION['user_id']) {
                         $pdo->prepare("DELETE FROM tasks WHERE id = ?")->execute([$task_id]);
                         Logger::logActivity($pdo, $_SESSION['user_id'], 5, 'Tasks', 'Delete', "Deleted task ID {$task_id}");
                         if ($taskData['volunteer_id']) {
@@ -206,47 +206,137 @@ try {
     $totalPages = 1;
 }
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Task Management | <?php echo htmlspecialchars(APP_NAME); ?></title>
-    
-    <!-- Premium Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Dashboard Core CSS -->
-    <link rel="stylesheet" href="assets/css/dashboard.css">
-    
-    <style>
-        .filter-bar { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
-        .filter-bar input, .filter-bar select { padding: 10px 15px; border: 1px solid rgba(0,0,0,0.1); border-radius: 8px; font-family: var(--font-body); background: white; min-width: 150px; }
-        .filter-bar input:focus, .filter-bar select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(124, 154, 134, 0.2); }
-        
-        .modal { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(6px); z-index: 1050; display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: all 0.3s ease; }
-        .modal.active { opacity: 1; visibility: visible; }
-        .modal-content { background: white; padding: 25px; border-radius: 16px; width: 100%; max-width: 500px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); transform: scale(0.95); transition: all 0.3s ease; max-height: 90vh; overflow-y: auto; }
-        .modal.active .modal-content { transform: scale(1); }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid rgba(0,0,0,0.05); }
-        .modal-header h3 { margin: 0; font-size: 1.2rem; color: var(--text-dark); }
-        .modal-close { background: none; border: none; font-size: 1.2rem; color: var(--text-muted); cursor: pointer; }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 0.9rem; color: var(--text-dark); }
-        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px 15px; border: 1px solid rgba(0,0,0,0.1); border-radius: 8px; background: white; font-family: var(--font-body); }
-        .pagination { display: flex; justify-content: center; gap: 5px; margin-top: 20px; }
-        .page-btn { padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(0,0,0,0.1); background: white; color: var(--text-dark); text-decoration: none; transition: all 0.2s; }
-        .page-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
-    </style>
-</head>
-<body>
+<?php 
 
-<div class="dashboard-layout">
-    <?php include __DIR__ . '/includes/dashboard/sidebar.php'; ?>
+// --- AJAX MODAL HANDLER ---
+if (isset($_GET['modal'])) {
+    if ($_GET['modal'] === 'create_task') {
+        // Fetch all approved volunteers for events managed by this coordinator
+        $volStmt = $pdo->prepare("
+            SELECT er.volunteer_id, er.event_id, u.full_name, e.title as event_title 
+            FROM volunteer_registrations er 
+            JOIN users u ON er.volunteer_id = u.id 
+            JOIN events e ON er.event_id = e.id 
+            WHERE er.approval_status = 'approved' AND e.coordinator_id = ?
+        ");
+        $volStmt->execute([$_SESSION['user_id']]);
+        $allVolunteers = $volStmt->fetchAll(PDO::FETCH_ASSOC);
+        ?>
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Assign New Task</h2>
+                <button type="button" class="close-btn" data-modal-close="true"><i class="fas fa-times"></i></button>
+            </div>
+            <form method="POST" action="coordinator_tasks.php" class="ajax-form">
+                <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token'] ?? ''; ?>">
+                <input type="hidden" name="action" value="create_task">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Select Volunteer & Event *</label>
+                        <select class="form-control" name="volunteer_event" required>
+                            <option value="">-- Select --</option>
+                            <?php foreach($allVolunteers as $vol): ?>
+                                <option value="<?php echo $vol['volunteer_id'] . '|' . $vol['event_id']; ?>">
+                                    <?php echo htmlspecialchars($vol['full_name'] ?? '') . ' - ' . htmlspecialchars($vol['event_title'] ?? ''); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Task Name *</label>
+                        <input class="form-control" type="text" name="task_name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea class="form-control" name="description" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Priority *</label>
+                        <select class="form-control" name="priority" required>
+                            <option value="medium">Medium</option>
+                            <option value="high">High</option>
+                            <option value="low">Low</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Deadline (Optional)</label>
+                        <input type="datetime-local" name="deadline">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-modal-close="true">Cancel</button>
+                    <button type="submit" class="btn-primary">Assign Task</button>
+                </div>
+            </form>
+        </div>
+        <?php
+        exit;
+    }
 
-    <main class="main-content">
-        <?php include __DIR__ . '/includes/dashboard/topbar.php'; ?>
+    if ($_GET['modal'] === 'edit_task') {
+        $task_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+        $stmt = $pdo->prepare("SELECT * FROM tasks WHERE id = ?");
+        $stmt->execute([$task_id]);
+        $task = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($task) {
+            ?>
+            <div class="modal">
+                <div class="modal-header">
+                    <h2>Edit Task</h2>
+                    <button type="button" class="close-btn" data-modal-close="true"><i class="fas fa-times"></i></button>
+                </div>
+                <form method="POST" action="coordinator_tasks.php" class="ajax-form">
+                    <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token'] ?? ''; ?>">
+                    <input type="hidden" name="action" value="update_task">
+                    <input type="hidden" name="task_id" value="<?php echo $task['id'] ?? ''; ?>">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>Task Name *</label>
+                            <input class="form-control" type="text" name="task_name" value="<?php echo htmlspecialchars($task['task_name'] ?? ''); ?>" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Description</label>
+                            <textarea class="form-control" name="description" rows="3"><?php echo htmlspecialchars($task['description'] ?? ''); ?></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Status *</label>
+                            <select class="form-control" name="completion_status" required>
+                                <option value="pending" <?php echo ($task['completion_status'] ?? '') == 'pending' ? 'selected' : ''; ?>>Pending</option>
+                                <option value="in_progress" <?php echo ($task['completion_status'] ?? '') == 'in_progress' ? 'selected' : ''; ?>>In Progress</option>
+                                <option value="needs_revision" <?php echo ($task['completion_status'] ?? '') == 'needs_revision' ? 'selected' : ''; ?>>Needs Revision</option>
+                                <option value="completed" <?php echo ($task['completion_status'] ?? '') == 'completed' ? 'selected' : ''; ?>>Completed</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Priority *</label>
+                            <select class="form-control" name="priority" required>
+                                <option value="medium" <?php echo ($task['priority'] ?? '') == 'medium' ? 'selected' : ''; ?>>Medium</option>
+                                <option value="high" <?php echo ($task['priority'] ?? '') == 'high' ? 'selected' : ''; ?>>High</option>
+                                <option value="low" <?php echo ($task['priority'] ?? '') == 'low' ? 'selected' : ''; ?>>Low</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Deadline (Optional)</label>
+                            <input type="datetime-local" name="deadline" value="<?php echo $task['deadline'] ? str_replace(' ', 'T', substr($task['deadline'], 0, 16)) : ''; ?>">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-modal-close="true">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Update Task</button>
+                    </div>
+                </form>
+            </div>
+            <?php
+        }
+        exit;
+    }
+}
+// --- END AJAX MODAL HANDLER ---
+
+
+$page_title = "Task Management";
+require_once __DIR__ . '/includes/dashboard/layout_header.php'; 
+?>
 
         <div class="page-content">
             <!-- Header Section -->
@@ -260,7 +350,7 @@ try {
                     </div>
                 </div>
                 <div class="header-actions">
-                    <button class="btn-primary" onclick="openCreateModal()">
+                    <button class="btn-primary" data-ajax-modal="true" data-url="coordinator_tasks.php?modal=create_task">
                         <i class="fas fa-plus"></i> Assign Task
                     </button>
                 </div>
@@ -281,25 +371,25 @@ try {
             <!-- Filter Bar -->
             <div class="glass-card" style="margin-bottom: 20px;">
                 <form method="GET" action="coordinator_tasks.php" class="filter-bar">
-                    <input type="text" name="search" placeholder="Search task or volunteer..." value="<?php echo htmlspecialchars($search); ?>">
+                    <input class="form-control" type="text" name="search" placeholder="Search task or volunteer..." value="<?php echo htmlspecialchars($search); ?>">
                     
-                    <select name="event_id">
+                    <select class="form-control" name="event_id">
                         <option value="">All Events</option>
                         <?php foreach($allEvents as $evt): ?>
-                            <option value="<?php echo $evt['id']; ?>" <?php echo $event_filter == $evt['id'] ? 'selected' : ''; ?>>
-                                <?php echo htmlspecialchars($evt['title']); ?>
+                            <option value="<?php echo $evt['id'] ?? ''; ?>" <?php echo $event_filter == $evt['id'] ? 'selected' : ''; ?>>
+                                <?php echo htmlspecialchars($evt['title'] ?? ''); ?>
                             </option>
                         <?php endforeach; ?>
                     </select>
 
-                    <select name="status">
+                    <select class="form-control" name="status">
                         <option value="">All Statuses</option>
                         <option value="pending" <?php echo $status_filter === 'pending' ? 'selected' : ''; ?>>Pending</option>
                         <option value="in_progress" <?php echo $status_filter === 'in_progress' ? 'selected' : ''; ?>>In Progress</option>
                         <option value="completed" <?php echo $status_filter === 'completed' ? 'selected' : ''; ?>>Completed</option>
                     </select>
 
-                    <select name="priority">
+                    <select class="form-control" name="priority">
                         <option value="">All Priorities</option>
                         <option value="high" <?php echo $priority_filter === 'high' ? 'selected' : ''; ?>>High</option>
                         <option value="medium" <?php echo $priority_filter === 'medium' ? 'selected' : ''; ?>>Medium</option>
@@ -332,14 +422,14 @@ try {
                                 <?php foreach($tasks as $task): ?>
                                 <tr>
                                     <td>
-                                        <div style="font-weight: 600; color: var(--text-dark);"><?php echo htmlspecialchars($task['task_name']); ?></div>
-                                        <div style="font-size: 0.8rem; color: var(--text-muted); max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"><?php echo htmlspecialchars($task['description']); ?></div>
+                                        <div style="font-weight: 600; color: var(--text-dark);"><?php echo htmlspecialchars($task['task_name'] ?? ''); ?></div>
+                                        <div style="font-size: 0.8rem; color: var(--text-muted); max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"><?php echo htmlspecialchars($task['description'] ?? ''); ?></div>
                                     </td>
                                     <td>
                                         <div style="font-weight: 500; color: var(--text-dark);"><i class="far fa-user"></i> <?php echo htmlspecialchars($task['volunteer_name'] ?? 'Unassigned'); ?></div>
                                     </td>
                                     <td>
-                                        <div style="color: var(--text-dark); font-size: 0.9rem;"><?php echo htmlspecialchars($task['event_title']); ?></div>
+                                        <div style="color: var(--text-dark); font-size: 0.9rem;"><?php echo htmlspecialchars($task['event_title'] ?? ''); ?></div>
                                     </td>
                                     <td>
                                         <?php 
@@ -365,13 +455,13 @@ try {
                                     </td>
                                     <td>
                                         <div style="display: flex; gap: 8px;">
-                                            <button onclick='openEditModal(<?php echo json_encode($task); ?>)' class="action-btn" style="width: 32px; height: 32px; color: var(--primary);" title="Edit Task">
+                                            <button data-ajax-modal="true" data-url="coordinator_tasks.php?modal=edit_task&id=<?php echo $task['id'] ?? ''; ?>" class="action-btn" style="width: 32px; height: 32px; color: var(--primary);" title="Edit Task">
                                                 <i class="fas fa-edit"></i>
                                             </button>
                                             <form method="POST" action="coordinator_tasks.php" onsubmit="return confirm('Are you sure you want to delete this task?');" style="display:inline;">
-                                                <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+                                                <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token'] ?? ''; ?>">
                                                 <input type="hidden" name="action" value="delete_task">
-                                                <input type="hidden" name="task_id" value="<?php echo $task['id']; ?>">
+                                                <input type="hidden" name="task_id" value="<?php echo $task['id'] ?? ''; ?>">
                                                 <button type="submit" class="action-btn" style="width: 32px; height: 32px; color: var(--danger);" title="Delete Task">
                                                     <i class="fas fa-trash-alt"></i>
                                                 </button>
@@ -398,148 +488,6 @@ try {
                 <?php endif; ?>
             </div>
         </div>
-    </main>
-</div>
-
-<!-- Create Modal -->
-<div class="modal" id="createModal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3>Assign New Task</h3>
-            <button class="modal-close" onclick="closeCreateModal()"><i class="fas fa-times"></i></button>
-        </div>
-        <form method="POST" action="coordinator_tasks.php">
-            <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
-            <input type="hidden" name="action" value="create_task">
-            
-            <div class="form-group">
-                <label>Select Volunteer (Approved for Event)</label>
-                <select name="volunteer_event" required>
-                    <option value="">-- Choose Volunteer & Event --</option>
-                    <?php foreach($allVolunteers as $v): ?>
-                        <option value="<?php echo $v['volunteer_id'] . '|' . $v['event_id']; ?>">
-                            <?php echo htmlspecialchars($v['full_name']) . " -> " . htmlspecialchars($v['event_title']); ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label>Task Name</label>
-                <input type="text" name="task_name" required>
-            </div>
-            
-            <div class="form-group">
-                <label>Description</label>
-                <textarea name="description" rows="3"></textarea>
-            </div>
-            
-            <div style="display: flex; gap: 15px;">
-                <div class="form-group" style="flex: 1;">
-                    <label>Priority</label>
-                    <select name="priority" required>
-                        <option value="medium">Medium</option>
-                        <option value="high">High</option>
-                        <option value="low">Low</option>
-                    </select>
-                </div>
-                <div class="form-group" style="flex: 1;">
-                    <label>Deadline (Optional)</label>
-                    <input type="datetime-local" name="deadline">
-                </div>
-            </div>
-            
-            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
-                <button type="button" class="btn-primary" style="background: rgba(0,0,0,0.05); color: var(--text-dark);" onclick="closeCreateModal()">Cancel</button>
-                <button type="submit" class="btn-primary">Assign Task</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<!-- Edit Modal -->
-<div class="modal" id="editModal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3>Edit Task</h3>
-            <button class="modal-close" onclick="closeEditModal()"><i class="fas fa-times"></i></button>
-        </div>
-        <form method="POST" action="coordinator_tasks.php">
-            <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
-            <input type="hidden" name="action" value="update_task">
-            <input type="hidden" name="task_id" id="edit_task_id" value="">
-            
-            <div class="form-group">
-                <label>Task Name</label>
-                <input type="text" name="task_name" id="edit_task_name" required>
-            </div>
-            
-            <div class="form-group">
-                <label>Description</label>
-                <textarea name="description" id="edit_description" rows="3"></textarea>
-            </div>
-            
-            <div style="display: flex; gap: 15px;">
-                <div class="form-group" style="flex: 1;">
-                    <label>Status</label>
-                    <select name="completion_status" id="edit_status" required>
-                        <option value="pending">Pending</option>
-                        <option value="in_progress">In Progress</option>
-                        <option value="completed">Completed</option>
-                    </select>
-                </div>
-                <div class="form-group" style="flex: 1;">
-                    <label>Priority</label>
-                    <select name="priority" id="edit_priority" required>
-                        <option value="high">High</option>
-                        <option value="medium">Medium</option>
-                        <option value="low">Low</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>Deadline (Optional)</label>
-                <input type="datetime-local" name="deadline" id="edit_deadline">
-            </div>
-            
-            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
-                <button type="button" class="btn-primary" style="background: rgba(0,0,0,0.05); color: var(--text-dark);" onclick="closeEditModal()">Cancel</button>
-                <button type="submit" class="btn-primary">Update Task</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<script src="assets/js/dashboard.js"></script>
-<script>
-    function formatDT(mysqlDT) {
-        if (!mysqlDT) return '';
-        return mysqlDT.replace(' ', 'T').substring(0, 16);
-    }
-
-    function openCreateModal() {
-        document.getElementById('createModal').classList.add('active');
-    }
-    
-    function closeCreateModal() {
-        document.getElementById('createModal').classList.remove('active');
-    }
-
-    function openEditModal(task) {
-        document.getElementById('edit_task_id').value = task.id;
-        document.getElementById('edit_task_name').value = task.task_name;
-        document.getElementById('edit_description').value = task.description;
-        document.getElementById('edit_status').value = task.completion_status;
-        document.getElementById('edit_priority').value = task.priority;
-        document.getElementById('edit_deadline').value = formatDT(task.deadline);
         
-        document.getElementById('editModal').classList.add('active');
-    }
     
-    function closeEditModal() {
-        document.getElementById('editModal').classList.remove('active');
-    }
-</script>
-</body>
-</html>
+<?php require_once __DIR__ . '/includes/dashboard/layout_footer.php'; ?>

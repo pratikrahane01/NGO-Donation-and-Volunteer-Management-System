@@ -31,25 +31,10 @@ try {
     error_log("Volunteer Applications Error: " . $e->getMessage());
 }
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Applications | <?php echo APP_NAME; ?></title>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="assets/css/dashboard.css">
-</head>
-<body>
-
-<div class="dashboard-layout">
-    <?php include __DIR__ . '/includes/dashboard/sidebar.php'; ?>
-    <main class="main-content">
-        <?php include __DIR__ . '/includes/dashboard/topbar.php'; ?>
+<?php 
+$page_title = "My Applications";
+require_once __DIR__ . '/includes/dashboard/layout_header.php'; 
+?>
 
         <div class="page-content">
             <div class="page-header">
@@ -76,7 +61,7 @@ try {
                                 <?php foreach($applications as $app): ?>
                                 <tr>
                                     <td>
-                                        <strong style="color: var(--text-dark);"><?php echo htmlspecialchars($app['event_title']); ?></strong>
+                                        <strong style="color: var(--text-dark);"><?php echo htmlspecialchars($app['event_title'] ?? ''); ?></strong>
                                     </td>
                                     <td>
                                         <span style="font-size: 0.85rem; color: var(--text-muted);">
@@ -93,7 +78,7 @@ try {
                                         }
                                         ?>
                                         <span class="status-badge <?php echo $statusClass; ?>">
-                                            <?php echo ucfirst(htmlspecialchars($app['approval_status'])); ?>
+                                            <?php echo ucfirst(htmlspecialchars($app['approval_status'] ?? '')); ?>
                                         </span>
                                     </td>
                                 </tr>
@@ -105,10 +90,5 @@ try {
             </div>
             
         </div>
-    </main>
-</div>
-
-<script src="assets/js/dashboard.js"></script>
-
-</body>
-</html>
+    
+<?php require_once __DIR__ . '/includes/dashboard/layout_footer.php'; ?>

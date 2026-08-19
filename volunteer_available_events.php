@@ -103,85 +103,10 @@ try {
     error_log("Volunteer Available Events Error: " . $e->getMessage());
 }
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Available Events | <?php echo APP_NAME; ?></title>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="assets/css/dashboard.css">
-    <style>
-        .event-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 20px;
-        }
-        .event-card {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            border: 1px solid rgba(0,0,0,0.05);
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-        .event-card-header {
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-            padding-bottom: 10px;
-        }
-        .event-card-title {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: var(--text-dark);
-            margin-bottom: 5px;
-        }
-        .event-card-desc {
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            line-height: 1.5;
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-        .event-detail-item {
-            font-size: 0.85rem;
-            color: var(--text-dark);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .event-detail-item i {
-            color: var(--primary);
-            width: 16px;
-        }
-        .progress-bar-container {
-            width: 100%;
-            background: rgba(0,0,0,0.05);
-            border-radius: 4px;
-            height: 6px;
-            overflow: hidden;
-            margin-top: 5px;
-        }
-        .progress-bar-fill {
-            height: 100%;
-            background: var(--primary);
-            border-radius: 4px;
-        }
-    </style>
-</head>
-<body>
-
-<div class="dashboard-layout">
-    <?php include __DIR__ . '/includes/dashboard/sidebar.php'; ?>
-    <main class="main-content">
-        <?php include __DIR__ . '/includes/dashboard/topbar.php'; ?>
+<?php 
+$page_title = "Available Events";
+require_once __DIR__ . '/includes/dashboard/layout_header.php'; 
+?>
 
         <div class="page-content">
             <div class="page-header">
@@ -211,8 +136,8 @@ try {
                     <?php foreach($events as $evt): ?>
                         <div class="event-card">
                             <div class="event-card-header">
-                                <div class="event-card-title"><?php echo htmlspecialchars($evt['title']); ?></div>
-                                <div class="event-card-desc"><?php echo htmlspecialchars($evt['description']); ?></div>
+                                <div class="event-card-title"><?php echo htmlspecialchars($evt['title'] ?? ''); ?></div>
+                                <div class="event-card-desc"><?php echo htmlspecialchars($evt['description'] ?? ''); ?></div>
                             </div>
                             
                             <div style="display: flex; flex-direction: column; gap: 8px;">
@@ -222,7 +147,7 @@ try {
                                 </div>
                                 <div class="event-detail-item">
                                     <i class="fas fa-map-marker-alt"></i>
-                                    <span><?php echo htmlspecialchars($evt['venue']); ?></span>
+                                    <span><?php echo htmlspecialchars($evt['venue'] ?? ''); ?></span>
                                 </div>
                                 <?php if ($evt['registration_deadline']): ?>
                                 <div class="event-detail-item" style="color: var(--danger);">
@@ -232,7 +157,7 @@ try {
                                 <?php endif; ?>
                                 <div class="event-detail-item">
                                     <i class="fas fa-info-circle"></i>
-                                    <span>Status: <strong style="text-transform: capitalize;"><?php echo htmlspecialchars($evt['status']); ?></strong></span>
+                                    <span>Status: <strong style="text-transform: capitalize;"><?php echo htmlspecialchars($evt['status'] ?? ''); ?></strong></span>
                                 </div>
                             </div>
                             
@@ -264,8 +189,8 @@ try {
                                     </button>
                                 <?php else: ?>
                                     <form method="POST" action="volunteer_available_events.php" onsubmit="return confirm('Are you sure you want to register for this event?');">
-                                        <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
-                                        <input type="hidden" name="register_event_id" value="<?php echo $evt['id']; ?>">
+                                        <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token'] ?? ''; ?>">
+                                        <input type="hidden" name="register_event_id" value="<?php echo $evt['id'] ?? ''; ?>">
                                         <button type="submit" class="btn-primary" style="width: 100%;">
                                             Register
                                         </button>
@@ -278,10 +203,5 @@ try {
             </div>
             
         </div>
-    </main>
-</div>
-
-<script src="assets/js/dashboard.js"></script>
-
-</body>
-</html>
+    
+<?php require_once __DIR__ . '/includes/dashboard/layout_footer.php'; ?>
