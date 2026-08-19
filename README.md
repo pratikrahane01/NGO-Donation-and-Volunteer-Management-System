@@ -56,7 +56,7 @@ NGO-Donation-Management-System/
 ## System Visuals
 
 ### Landing Page
-![Landing Page](screenshots_v2/public_landing.png)
+![Landing Page](screenshots/landing_home.png)
 
 ### User Dashboards
 
