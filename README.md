@@ -78,4 +78,18 @@ Open your browser and navigate to:
 - [ ] **Advanced Analytics**: Interactive charting using Chart.js for data visualization.
 - [ ] **RESTful API**: Exposing core services for mobile application consumption.
 
+---
 
+## 🖼️ System Visuals
+
+**Landing Page**
+<img src="screenshots/landing_page.png" alt="Landing Page" width="100%">
+
+**Super Administrator Dashboard**
+<img src="screenshots/admin_dashboard.png" alt="Super Administrator Dashboard" width="100%">
+
+**NGO Administrator Dashboard**
+<img src="screenshots/ngo_dashboard.png" alt="NGO Administrator Dashboard" width="100%">
+
+**Event Coordinator Dashboard**
+<img src="screenshots/coordinator_dashboard.png" alt="Event Coordinator Dashboard" width="100%">
