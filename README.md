@@ -1,62 +1,93 @@
-# NGO Donation & Volunteer Management System
+# Arohan Foundation — Enterprise-Grade NGO Management System
 
-## Project Description
-A comprehensive, scalable platform to manage NGO donations, track volunteers, coordinate events, and generate insightful reports. Designed to streamline operations for super admins, NGO admins, donors, volunteers, and event coordinators.
+Arohan Foundation is a comprehensive, multi-tenant web application designed to streamline NGO operations. Instead of relying on disparate tools, this system unifies donation tracking, volunteer management, event coordination, and administrative reporting into a single, cohesive platform.
 
-## Technology Stack
-- **Frontend**: HTML5, CSS3, Vanilla JavaScript
-- **Backend**: Core PHP
-- **Database**: MySQL
-- **Server**: XAMPP
-- **Authentication**: PHP Sessions
+Built with a focus on raw performance, security, and scalability using Core PHP and MySQL.
 
-## Folder Structure
-```
-NGO-Donation-Management-System/
-├── api/             # API endpoints for ajax requests
-├── assets/          # Static files (CSS, JS, Images, Fonts)
-├── config/          # Application and database configuration
-├── database/        # SQL schemas and sample data
-├── includes/        # Reusable template parts and utilities
-├── logs/            # Application log files
-├── migrations/      # Database migration scripts
-├── modules/         # Core application features
-├── notifications/   # System notifications module
-├── reports/         # Reporting module
-├── settings/        # System settings module
-├── uploads/         # User uploaded files
-├── users/           # User role specific dashboards/logic
-├── vendor/          # Third-party dependencies (composer)
-├── composer.json    # Project metadata
-├── index.php        # Application entry point
-└── README.md        # Project documentation
+---
+
+## 🏗 Architecture & Engineering
+
+- **Role-Based Access Control (RBAC)**: Deeply integrated permission system supporting 5 distinct user roles (Super Admin, NGO Admin, Coordinator, Volunteer, Donor) with isolated dashboard views and restricted API endpoints.
+- **Security First**: Comprehensive protection against SQL Injection, XSS, and CSRF vulnerabilities using PDO prepared statements, output sanitization, and strict session management.
+- **Custom MVC Pattern**: Engineered a bespoke Model-View-Controller architecture without heavy frameworks to ensure optimal performance and complete control over the request lifecycle.
+- **Responsive UI/UX**: Designed a premium, accessible interface using Vanilla CSS and JavaScript, minimizing reliance on heavy third-party libraries for lightning-fast page loads.
+
+## ✨ Key Features
+
+- **Centralized Dashboard & Analytics**: Real-time insights into donation metrics, volunteer attendance, and campaign progress.
+- **Donation Tracking & Receipt Generation**: Automated workflow from payment processing (Razorpay integration ready) to customizable PDF receipt generation.
+- **Event & Task Management**: Coordinators can create events, assign tasks to volunteers, track attendance, and manage applications seamlessly.
+- **Inquiry & Notification System**: Built-in messaging and real-time notification engine keeping all stakeholders updated on critical actions.
+
+---
+
+## 🚀 Quick Start
+
+### 1. Clone the repository
+```bash
+git clone https://github.com/pratikrahane01/NGO-Donation-and-Volunteer-Management-System.git
+cd NGO-Donation-and-Volunteer-Management-System
 ```
 
-## Requirements
-- XAMPP with PHP 8.x and MySQL
-- Any modern web browser
+### 2. Configure Environment
+Ensure you have **XAMPP** (PHP 8.x + MySQL) installed.
+Move the project folder into your XAMPP `htdocs` directory.
 
-## Installation Instructions & How to Run Using XAMPP
-1. Download or clone this repository.
-2. Copy the `NGO-Donation-Management-System` folder to your XAMPP `htdocs` directory (e.g., `C:\xampp\htdocs\`).
-3. Start **Apache** and **MySQL** modules from the XAMPP Control Panel.
-4. Open your browser and navigate to `http://localhost/phpmyadmin`.
-5. Create a new database named `ngo_management`.
-6. Import the `database/schema.sql` file into the newly created database.
-7. (Optional) Import `database/sample_data.sql` for dummy data.
-8. Update the database credentials in `config/database.php` if necessary.
-9. Open your browser and navigate to `http://localhost/NGO-Donation-Management-System/` to access the application.
+### 3. Database Setup
+Start Apache and MySQL from the XAMPP Control Panel.
+```bash
+# Navigate to phpMyAdmin: http://localhost/phpmyadmin
+# 1. Create a database named `ngo_management`
+# 2. Import the schema file located at: database/schema.sql
+# 3. (Optional) Import dummy data from: database/sample_data.sql
+```
 
-## Future Modules
-- Payment Gateway Integration
-- Email Notifications
-- Advanced Analytics Dashboard
-- Mobile App API
+### 4. Application Configuration
+Verify the database credentials in `config/database.php`:
+```php
+define('DB_HOST', 'localhost');
+define('DB_USER', 'root');
+define('DB_PASS', '');
+define('DB_NAME', 'ngo_management');
+```
 
-## System Visuals
+### 5. Launch
+Open your browser and navigate to:
+`http://localhost/NGO-Donation-and-Volunteer-Management-System/`
 
-### Landing Page
-![Landing Page](screenshots/landing_home.png)
+---
 
-### Dashboard Preview
-![Dashboard Preview](screenshots_v2/Super_Admin_dashboard_auto.png)
+## 📂 Project Structure
+
+- **`api/`** — API endpoints handling asynchronous AJAX requests.
+- **`assets/`** — Static assets (CSS, JS, optimized imagery).
+- **`config/`** — Core configuration files and environment settings.
+- **`core/`** — Foundation classes (Session handling, Database wrappers, Security).
+- **`database/`** — SQL schemas and migration scripts.
+- **`includes/`** — Reusable UI components and layouts.
+- **`modules/`** — Domain-specific logic (Donations, Volunteers, Events).
+- **`vendor/`** — Composer dependencies.
+
+---
+
+## 🔮 Roadmap
+
+- [ ] **Payment Gateway**: Finalizing Razorpay integration for live transactions.
+- [ ] **Email Engine**: Implementing SMTP/SendGrid for automated donor receipts.
+- [ ] **Advanced Analytics**: Interactive charting using Chart.js for data visualization.
+- [ ] **RESTful API**: Exposing core services for mobile application consumption.
+
+---
+
+<details>
+<summary><b>🖼️ System Screenshots (Click to expand)</b></summary>
+<br>
+
+**Landing Page**
+<img src="screenshots/landing_home.png" alt="Landing Page" width="100%">
+
+**Super Admin Dashboard**
+<img src="screenshots_v2/Super_Admin_dashboard_auto.png" alt="Dashboard Preview" width="100%">
+
+</details>
